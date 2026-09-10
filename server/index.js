@@ -40,7 +40,7 @@ import {
 } from "./update_package.js";
 
 const VERCEL_BASE_URL = String(process.env.PUBLIC_BASE_URL || "https://tdt-tiktok.vercel.app").replace(/\/$/, "");
-const APP_VERSION = "4.0.4";
+const APP_VERSION = "4.0.5";
 const EXTENSION_VERSION = "4.0.2";
 const APP_SECRET = String(process.env.TDT_APP_SECRET || process.env.TDT_ADMIN_TOKEN || "");
 if (!APP_SECRET || APP_SECRET.length < 32) {
@@ -130,57 +130,116 @@ function sqlComparisonOperator(operator) {
   return normalized;
 }
 
-function collectionReference(name) {
-  const state = { name: encodePath(name), filters: [], order: null, limit: null };
+function collectionReference(name, queryState = null) {
+  // Firestore Query objects are immutable. The old Vercel adapter mutated one shared
+  // state object and returned the same query instance from where()/orderBy()/limit().
+  // adminState() intentionally reuses usersReference for many concurrent queries;
+  // the mutable implementation caused filters to leak between them (including
+  // listState == whitelist AND listState == blacklist), so Admin could show 0 users
+  // even though the Extension had already written accounts.
+  const state = queryState
+    ? {
+        name: encodePath(queryState.name || name),
+        filters: Array.isArray(queryState.filters) ? queryState.filters.map((item) => [...item]) : [],
+        order: Array.isArray(queryState.order) ? [...queryState.order] : null,
+        limit: queryState.limit == null ? null : Math.max(1, Number(queryState.limit) || 1)
+      }
+    : { name: encodePath(name), filters: [], order: null, limit: null };
+
+  const next = (patch = {}) => collectionReference(state.name, {
+    name: state.name,
+    filters: patch.filters === undefined ? state.filters : patch.filters,
+    order: patch.order === undefined ? state.order : patch.order,
+    limit: patch.limit === undefined ? state.limit : patch.limit
+  });
+
+  function appendFilters(q, params, filters = state.filters) {
+    for (const [field, op, value] of filters) {
+      const idx = params.length + 1;
+      const sqlOp = sqlComparisonOperator(op);
+      if (typeof value === "boolean") {
+        q += ` AND (data ->> ($${idx})::text) ${sqlOp} ($${idx + 1})::text`;
+        params.push(field, String(value));
+      } else if (typeof value === "number") {
+        q += ` AND COALESCE(NULLIF(data ->> ($${idx})::text, ''), '0')::double precision ${sqlOp} ($${idx + 1})::double precision`;
+        params.push(field, Number(value));
+      } else {
+        q += ` AND (data ->> ($${idx})::text) ${sqlOp} ($${idx + 1})::text`;
+        params.push(field, String(value));
+      }
+    }
+    return q;
+  }
+
   const api = {
-    where(field, op, value) { state.filters.push([field,op,value]); return api; },
-    orderBy(field, direction="asc") { state.order=[field,String(direction).toLowerCase()==="desc"?"DESC":"ASC"]; return api; },
-    limit(n) { state.limit=Math.max(1,Number(n)||1); return api; },
+    where(field, op, value) {
+      return next({ filters: [...state.filters, [field, op, value]] });
+    },
+    orderBy(field, direction = "asc") {
+      return next({ order: [field, String(direction).toLowerCase() === "desc" ? "DESC" : "ASC"] });
+    },
+    limit(n) {
+      return next({ limit: Math.max(1, Number(n) || 1) });
+    },
     async get() {
+      // Capture a private copy before the first await so concurrent queries can never
+      // influence each other even if this adapter changes again later.
+      const local = {
+        name: state.name,
+        filters: state.filters.map((item) => [...item]),
+        order: state.order ? [...state.order] : null,
+        limit: state.limit
+      };
       await dbReady();
       let q = `SELECT path,data FROM app_documents WHERE namespace='doc' AND path LIKE $1`;
-      const params = [`${state.name}/%`];
-      for (const [field,op,value] of state.filters) {
-        const idx=params.length+1;
-        const sqlOp=sqlComparisonOperator(op);
-        if(typeof value === "boolean") {
-          q += ` AND (data ->> ($${idx})::text) ${sqlOp} ($${idx+1})::text`;
-          params.push(field,String(value));
-        } else if(typeof value === "number") {
-          q += ` AND COALESCE(NULLIF(data ->> ($${idx})::text, ''), '0')::double precision ${sqlOp} ($${idx+1})::double precision`;
-          params.push(field,Number(value));
-        } else {
-          q += ` AND (data ->> ($${idx})::text) ${sqlOp} ($${idx+1})::text`;
-          params.push(field,String(value));
-        }
+      const params = [`${local.name}/%`];
+      q = appendFilters(q, params, local.filters);
+      if (local.order) {
+        const idx = params.length + 1;
+        q += ` ORDER BY COALESCE(NULLIF(data ->> ($${idx})::text, ''), '0')::double precision ${local.order[1]}`;
+        params.push(local.order[0]);
       }
-      if (state.order) { const idx=params.length+1; q += ` ORDER BY COALESCE(NULLIF(data ->> ($${idx})::text, ''), '0')::double precision ${state.order[1]}`; params.push(state.order[0]); }
-      if (state.limit) q += ` LIMIT ${state.limit}`;
+      if (local.limit) q += ` LIMIT ${local.limit}`;
       const result = await sql.query(q, params);
-      return { size: result.rows.length, docs: result.rows.map(r=>makeSnapshot(r)) };
+      return { size: result.rows.length, docs: result.rows.map((row) => makeSnapshot(row)) };
     },
-    count() { return { get: async () => {
-      await dbReady();
-      let q=`SELECT COUNT(*)::bigint AS count FROM app_documents WHERE namespace='doc' AND path LIKE $1`;
-      const params=[`${state.name}/%`];
-      for(const [field,op,value] of state.filters){
-        const k=params.length+1;
-        const sqlOp=sqlComparisonOperator(op);
-        if(typeof value === "boolean"){
-          q+=` AND (data ->> ($${k})::text) ${sqlOp} ($${k+1})::text`;
-          params.push(field,String(value));
-        } else if(typeof value === "number"){
-          q+=` AND COALESCE(NULLIF(data ->> ($${k})::text, ''), '0')::double precision ${sqlOp} ($${k+1})::double precision`;
-          params.push(field,Number(value));
-        } else {
-          q+=` AND (data ->> ($${k})::text) ${sqlOp} ($${k+1})::text`;
-          params.push(field,String(value));
+    count() {
+      const local = {
+        name: state.name,
+        filters: state.filters.map((item) => [...item])
+      };
+      return {
+        get: async () => {
+          await dbReady();
+          let q = `SELECT COUNT(*)::bigint AS count FROM app_documents WHERE namespace='doc' AND path LIKE $1`;
+          const params = [`${local.name}/%`];
+          q = appendFilters(q, params, local.filters);
+          const result = await sql.query(q, params);
+          return { data: () => ({ count: Number(result.rows[0]?.count || 0) }) };
         }
-      }
-      const result=await sql.query(q,params);
-      return { data:()=>({count:Number(result.rows[0]?.count||0)}) };
-    } }; },
-    aggregate(spec) { return { get: async () => { await dbReady(); const entries=Object.entries(spec||{}); const values={}; for (const [alias,agg] of entries) { const result=await sql.query(`SELECT COALESCE(SUM(COALESCE(NULLIF(data ->> ($1)::text, ''), '0')::numeric),0) AS value FROM app_documents WHERE namespace='doc' AND path LIKE $2`, [agg.field, `${state.name}/%`]); values[alias]=Number(result.rows[0]?.value||0); } return { data:()=>values }; } }; }
+      };
+    },
+    aggregate(spec) {
+      const local = {
+        name: state.name,
+        filters: state.filters.map((item) => [...item])
+      };
+      return {
+        get: async () => {
+          await dbReady();
+          const entries = Object.entries(spec || {});
+          const values = {};
+          for (const [alias, agg] of entries) {
+            let q = `SELECT COALESCE(SUM(COALESCE(NULLIF(data ->> ($1)::text, ''), '0')::numeric),0) AS value FROM app_documents WHERE namespace='doc' AND path LIKE $2`;
+            const params = [agg.field, `${local.name}/%`];
+            q = appendFilters(q, params, local.filters);
+            const result = await sql.query(q, params);
+            values[alias] = Number(result.rows[0]?.value || 0);
+          }
+          return { data: () => values };
+        }
+      };
+    }
   };
   return api;
 }
@@ -542,8 +601,17 @@ async function handleGoogleExchange(request,response) {
   const credential=cleanText(body.credential,12000);
   if (!credential) return sendJson(response,400,{ok:false,error:"Thiếu Google credential."});
   let profile; try { profile=await verifyGoogleIdToken(credential); } catch (e) { return sendJson(response,401,{ok:false,error:"Google credential không hợp lệ."}); }
+  try {
+    // Đăng nhập thành công phải đồng thời đăng ký/touch tài khoản trong DB.
+    // Trước v4.0.5, auth chỉ trả token nên Admin có thể vẫn hiển thị 0 tài khoản
+    // cho tới khi /extension/check chạy thành công.
+    await upsertAuthenticatedUser(profile, { source: "google-login", touchLastSeen: true });
+  } catch (error) {
+    console.error("Cannot persist Google account", error);
+    return sendJson(response,503,{ok:false,error:"Đăng nhập Google đã xác thực nhưng không thể đồng bộ tài khoản vào Vercel Database. Hãy kiểm tra Postgres/Storage và thử lại."});
+  }
   const session=issueExtensionSession(profile), refreshToken=issueExtensionRefresh(profile);
-  return sendJson(response,200,{ok:true,idToken:session,refreshToken,uid:profile.uid,expiresIn:3600,email:profile.email,displayName:profile.name,photoURL:profile.picture,provider:"google.com"});
+  return sendJson(response,200,{ok:true,idToken:session,refreshToken,uid:profile.uid,expiresIn:3600,email:profile.email,displayName:profile.name,photoURL:profile.picture,provider:"google.com",adminSynced:true});
 }
 async function handleExtensionRefresh(request,response) {
   if (request.method!=="POST") return sendJson(response,405,{ok:false,error:"Method không được hỗ trợ."});
@@ -595,6 +663,71 @@ function syncProfile(decoded) {
   };
 }
 
+function authenticatedUserPatch(decoded, previousValue = {}, options = {}) {
+  const previous = previousValue && typeof previousValue === "object" ? previousValue : {};
+  const now = Math.max(0, Number(options.now) || Date.now());
+  const client = options.client && typeof options.client === "object" ? options.client : {};
+  const installId = validInstallId(options.clientId);
+  const isNew = options.isNew === true;
+  const touchLastSeen = options.touchLastSeen !== false;
+  const authAt = Math.max(0, Number(decoded.auth_time) || 0) * 1000;
+  const patch = {
+    authUid: String(decoded.uid || ""),
+    firstSeen: Math.max(0, Number(previous.firstSeen) || now),
+    lastSeen: touchLastSeen ? Math.max(Number(previous.lastSeen) || 0, now) : Math.max(0, Number(previous.lastSeen) || now),
+    lastAuthAt: Math.max(Number(previous.lastAuthAt) || 0, authAt || now),
+    provider: cleanText(decoded.provider || decoded.vercel?.sign_in_provider || "google.com", 40),
+    email: cleanText(decoded.email, 254),
+    displayName: cleanText(decoded.name, 120),
+    photoURL: cleanText(decoded.picture, 500),
+    emailVerified: decoded.email_verified === true,
+    updatedAt: now,
+    lastSyncSource: cleanText(options.source || "extension", 40)
+  };
+  if (installId) patch.clientId = installId;
+  if (Object.keys(client).length) {
+    Object.assign(patch, {
+      version: cleanText(client.version, 40),
+      locale: cleanText(client.locale, 40),
+      platform: cleanText(client.platform, 80),
+      browser: cleanText(client.browser, 240),
+      architecture: cleanText(client.architecture, 40),
+      mobile: client.mobile === true,
+      hardwareConcurrency: Math.max(0, Math.min(128, Number(client.hardwareConcurrency) || 0)),
+      deviceMemory: Math.max(0, Math.min(128, Number(client.deviceMemory) || 0)),
+      connectionType: cleanText(client.connectionType, 30),
+      timezone: cleanText(client.timezone, 80),
+      installReason: cleanText(client.installReason, 40),
+      extensionId: cleanText(client.extensionId, 64)
+    });
+  }
+  if (isNew) {
+    patch.locked = false;
+    patch.listState = initialListState(true, previous.listState);
+    patch.note = "";
+    patch.blockMessage = "";
+    patch.sessionCount = Math.max(1, Number(previous.sessionCount) || 0);
+    patch.activeDays = Math.max(1, Number(previous.activeDays) || 0);
+    patch.lastActiveDay = dayKey(now);
+    patch.installationCount = Math.max(0, Number(previous.installationCount) || 0);
+    patch.counters = previous.counters && typeof previous.counters === "object" ? previous.counters : {};
+    patch.daily = previous.daily && typeof previous.daily === "object" ? previous.daily : {};
+  }
+  return patch;
+}
+
+async function upsertAuthenticatedUser(decoded, options = {}) {
+  const uid = String(decoded?.uid || "");
+  if (!validUid(uid)) throw Object.assign(new Error("UID Google không hợp lệ."), { status: 400 });
+  const reference = firestore.doc(`users/${uid}`);
+  const snapshot = await reference.get();
+  const previous = snapshot.exists ? (snapshot.data() || {}) : {};
+  const patch = authenticatedUserPatch(decoded, previous, { ...options, isNew: !snapshot.exists });
+  await reference.set(patch, { merge: true });
+  invalidateAdminStateCache();
+  return { reference, isNew: !snapshot.exists, patch };
+}
+
 async function readAccountSync(uid, decoded) {
   const [mainSnapshot, watchSnapshot] = await Promise.all([
     firestore.doc(`extensionSync/${uid}`).get(),
@@ -613,17 +746,21 @@ async function mergeAccountSync(uid, decoded, body) {
   const watchReference = firestore.doc(`extensionWatch/${uid}`);
   const userReference = firestore.doc(`users/${uid}`);
   const now = Date.now();
+  const client = body.client && typeof body.client === "object" ? body.client : {};
+  const clientId = validInstallId(body.clientId) || "";
 
   await firestore.runTransaction(async (transaction) => {
-    const [mainSnapshot, watchSnapshot] = await Promise.all([
+    const [mainSnapshot, watchSnapshot, userSnapshot] = await Promise.all([
       transaction.get(mainReference),
-      transaction.get(watchReference)
+      transaction.get(watchReference),
+      transaction.get(userReference)
     ]);
     const currentMain = mainSnapshot.exists ? mainSnapshot.data() : {};
     const currentWatch = watchSnapshot.exists ? watchSnapshot.data() : {};
+    const currentUser = userSnapshot.exists ? (userSnapshot.data() || {}) : {};
     const nextMain = {
       ...mergeMainSyncDocument(currentMain, normalized, now),
-      lastClientId: validInstallId(body.clientId) || "",
+      lastClientId: clientId,
       profile: syncProfile(decoded)
     };
     const mergedWatch = mergeWatchAnalytics(currentWatch.data, normalized.data.watchAnalytics);
@@ -633,16 +770,28 @@ async function mergeAccountSync(uid, decoded, body) {
       revision: Math.max(0, Number(currentWatch.revision) || 0) + 1,
       createdAt: Number(currentWatch.createdAt) || now,
       updatedAt: now,
-      lastClientId: validInstallId(body.clientId) || ""
+      lastClientId: clientId
+    };
+    const userPatch = {
+      ...authenticatedUserPatch(decoded, currentUser, {
+        now,
+        clientId,
+        client,
+        source: "online-sync",
+        touchLastSeen: true,
+        isNew: !userSnapshot.exists
+      }),
+      onlineSyncAt: now,
+      onlineSyncRevision: Math.max(nextMain.revision, nextWatch.revision),
+      onlineSyncClientId: clientId,
+      onlineWatchSeconds: Math.max(0, Number(mergedWatch.totalWatchedSeconds) || 0),
+      onlineWatchVideos: Array.isArray(mergedWatch.allTimeVideoIds) ? mergedWatch.allTimeVideoIds.length : 0
     };
     transaction.set(mainReference, nextMain);
     transaction.set(watchReference, nextWatch);
-    transaction.set(userReference, {
-      onlineSyncAt: now,
-      onlineSyncRevision: Math.max(nextMain.revision, nextWatch.revision),
-      onlineSyncClientId: validInstallId(body.clientId) || ""
-    }, { merge: true });
+    transaction.set(userReference, userPatch, { merge: true });
   });
+  invalidateAdminStateCache();
   return readAccountSync(uid, decoded);
 }
 
@@ -787,8 +936,9 @@ async function handleExtensionCheck(request, response) {
   const [settings, access, update] = await Promise.all([ensureSettings(), ensureAccess(decoded.uid, defaultListState), getUpdateRelease()]);
   await Promise.all([
     recordUsage(userReference, body.counters, isNew, now),
-    userReference.set({ locked: access.locked, listState: access.listState, blockMessage: access.blockMessage }, { merge: true })
+    userReference.set({ locked: access.locked, listState: access.listState, blockMessage: access.blockMessage, updatedAt: now }, { merge: true })
   ]);
+  invalidateAdminStateCache();
   const decision = accessDecision(access, settings);
   sendJson(response, 200, {
     ok: true,
@@ -852,6 +1002,12 @@ function serializeUser(snapshot) {
     lastActiveDay: cleanText(data.lastActiveDay, 20),
     counters: numericCounters(data.counters),
     daily: data.daily && typeof data.daily === "object" ? data.daily : {},
+    onlineSyncAt: Number(data.onlineSyncAt) || 0,
+    onlineSyncRevision: Math.max(0, Number(data.onlineSyncRevision) || 0),
+    onlineSyncClientId: cleanText(data.onlineSyncClientId, 80),
+    onlineWatchSeconds: Math.max(0, Number(data.onlineWatchSeconds) || 0),
+    onlineWatchVideos: Math.max(0, Number(data.onlineWatchVideos) || 0),
+    lastSyncSource: cleanText(data.lastSyncSource, 40),
     updatedAt: Number(data.updatedAt) || 0
   };
 }

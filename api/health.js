@@ -11,7 +11,7 @@ export default async function handler(request, response) {
   const payload = {
     ok: true,
     service: "tdt-control-vercel",
-    version: "4.0.4",
+    version: "4.0.5",
     time: Date.now(),
     googleAuth: {
       configured: Boolean(googleClientId && !googleClientId.includes("__GOOGLE_CLIENT_ID__")),
