@@ -1,11 +1,9 @@
-import { initializeApp } from "firebase-admin/app";
+import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { AggregateField, FieldValue, getFirestore } from "firebase-admin/firestore";
 import { getDatabase } from "firebase-admin/database";
 import { getStorage } from "firebase-admin/storage";
 import { createHash } from "node:crypto";
-import { defineSecret, defineString } from "firebase-functions/params";
-import { onRequest } from "firebase-functions/v2/https";
 import {
   ACCESS_MODES,
   COUNTER_KEYS,
@@ -42,20 +40,38 @@ import {
   validUpdatePackageMagic
 } from "./update_package.js";
 
-initializeApp();
+function serviceAccountFromEnv() {
+  const raw = process.env.FIREBASE_SERVICE_ACCOUNT_JSON || process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON || "";
+  if (!raw) return null;
+  try {
+    const value = JSON.parse(raw);
+    if (value.private_key) value.private_key = value.private_key.replace(/\\n/g, "\n");
+    return value;
+  } catch (error) {
+    throw new Error("FIREBASE_SERVICE_ACCOUNT_JSON không hợp lệ.");
+  }
+}
+
+const firebaseOptions = {
+  projectId: process.env.FIREBASE_PROJECT_ID || "tran-duc-tai",
+  databaseURL: process.env.FIREBASE_DATABASE_URL || "https://tran-duc-tai-default-rtdb.asia-southeast1.firebasedatabase.app",
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET || "tran-duc-tai.firebasestorage.app"
+};
+const serviceAccount = serviceAccountFromEnv();
+if (!getApps().length) initializeApp(serviceAccount ? { ...firebaseOptions, credential: cert(serviceAccount) } : firebaseOptions);
 
 const firestore = getFirestore();
-const adminToken = defineSecret("TDT_ADMIN_TOKEN");
-const configuredProjectKey = defineString("TDT_PROJECT_KEY", { default: "tiktok-tai-dep-trai" });
-const configuredExtensionId = defineString("TDT_EXTENSION_ID", { default: "" });
+const adminToken = { value: () => String(process.env.TDT_ADMIN_TOKEN || "") };
+const configuredProjectKey = { value: () => String(process.env.TDT_PROJECT_KEY || "tiktok-tai-dep-trai") };
+const configuredExtensionId = { value: () => String(process.env.TDT_EXTENSION_ID || "") };
 const LEASE_MS = 90_000;
 const MAX_USERS_IN_DASHBOARD = 1000;
 const MAX_USERS_IN_EXPORT = 5000;
 const UPDATE_RELEASE_DOC = "config/updateRelease";
 const UPDATE_REALTIME_PATH = "update";
-const PUBLIC_BASE_URL = "https://tran-duc-tai.web.app";
+const PUBLIC_BASE_URL = String(process.env.PUBLIC_BASE_URL || "https://tran-duc-tai.vercel.app").replace(/\/$/, "");
 const DEFAULT_UPDATE_RELEASE = Object.freeze({
-  version: "3.0.0",
+  version: "3.7.0",
   downloadUrl: `${PUBLIC_BASE_URL}/extension/releases/TikTok_Tai_Dep_Trai_v3.0.0.zip`,
   releasePageUrl: `${PUBLIC_BASE_URL}/extension/`,
   releaseNotes: "HD hotfix: thay đúng video trên trang chủ, chỉ hiển thị player thay thế, chặn âm thanh video cũ, xác thực Video ID và giảm tải DOM.",
@@ -903,7 +919,7 @@ async function handleAdminApi(request, response, pathname) {
 export async function route(request, response) {
   const pathname = requestPath(request);
   if (pathname === "/api/health" || pathname === "/health") {
-    return sendJson(response, 200, { ok: true, service: "tdt-firebase-control", version: "3.0.0", time: Date.now() });
+    return sendJson(response, 200, { ok: true, service: "tdt-firebase-control", version: "3.7.0", time: Date.now() });
   }
   if (pathname === "/api/v1/extension/update-manifest") return handlePublicUpdateManifest(request, response);
   if (pathname === "/api/v1/extension/download") return handlePublicUpdateDownload(request, response);
@@ -913,27 +929,3 @@ export async function route(request, response) {
   return sendJson(response, 404, { ok: false, error: "Not found" });
 }
 
-const PUBLIC_FUNCTION_OPTIONS = Object.freeze({
-  region: "asia-southeast1",
-  cors: false,
-  timeoutSeconds: 120,
-  memory: "512MiB",
-  maxInstances: 20
-});
-
-async function runPublicHandler(handler, label, request, response) {
-  try {
-    await handler(request, response);
-  } catch (error) {
-    console.error(`TDT ${label} error`, error);
-    if (!response.headersSent) sendJson(response, Number(error?.status) || 500, { ok: false, error: error?.message || "Lỗi máy chủ." });
-    else response.end();
-  }
-}
-
-export const api = onRequest({
-  ...PUBLIC_FUNCTION_OPTIONS,
-  secrets: [adminToken]
-}, async (request, response) => {
-  await runPublicHandler(route, "Firebase API", request, response);
-});

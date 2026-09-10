@@ -7,7 +7,7 @@
 
 ## Google Auth & Dashboard v3.0.0
 
-- Luồng đăng nhập chính mở trực tiếp `https://tran-duc-tai.firebaseapp.com/auth-extension/` trong cửa sổ Chrome.
+- Luồng đăng nhập chính mở trực tiếp `https://tdt-firebase-control.vercel.app/auth-extension/` trong cửa sổ Chrome.
 - Dùng `signInWithRedirect()` và `browserSessionPersistence`; không còn phụ thuộc popup chạy trong iframe/offscreen ẩn.
 - Trang Firebase chỉ được phép trả kết quả về Extension ID `cpndheccadlhkiogcfdhagomiadbaogn` qua `externally_connectable`.
 - Mỗi phiên dùng nonce ngẫu nhiên 256-bit, tự hết hạn sau khoảng 3 phút.

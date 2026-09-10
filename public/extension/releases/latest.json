@@ -1,11 +1,11 @@
 {
-  "version": "3.6.0",
-  "downloadUrl": "/extension/releases/TikTok_Tai_Dep_Trai_v3.6.0.zip",
+  "version": "3.7.0",
+  "downloadUrl": "/extension/releases/TikTok_Tai_Dep_Trai_v3.7.0.zip",
   "releasePageUrl": "/extension/",
-  "releaseNotes": "v3.6.0: Shop Analytics trong control-dock, GMV badge trên dock, chỉ tự động hiển thị/phân tích một API được chọn; giữ nguyên toàn bộ chức năng.",
-  "publishedAt": "2026-09-10T10:22:00+07:00",
-  "sha256": "86d26c4a0549bdef2e3b7ece7d701e17fa11075089911d98737c340a8a484671",
+  "releaseNotes": "v3.7.0 Vercel-only: toàn bộ API điều khiển, đăng nhập extension và cập nhật extension dùng domain Vercel; giữ nguyên chức năng gốc.",
+  "publishedAt": "2026-09-10T10:30:00+07:00",
+  "sha256": "90a5390f19343a3bcf740c9ab1d6caa344df2e3427ef7ecb8d4d2654743d993e",
   "mandatory": true,
-  "filename": "TikTok_Tai_Dep_Trai_v3.6.0.zip",
-  "sizeBytes": 329363
+  "filename": "TikTok_Tai_Dep_Trai_v3.7.0.zip",
+  "sizeBytes": 332196
 }

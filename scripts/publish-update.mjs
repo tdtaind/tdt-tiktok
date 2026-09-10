@@ -18,7 +18,7 @@ await mkdir(releaseDir, { recursive: true });
 const filename = `TikTok_Tai_Dep_Trai_v${versionArg}${ext}`;
 await copyFile(source, resolve(releaseDir, filename));
 
-const baseUrl = "https://tran-duc-tai.web.app/extension";
+const baseUrl = "https://tdt-firebase-control.vercel.app/extension";
 const manifest = {
   version: versionArg,
   downloadUrl: `${baseUrl}/releases/${filename}`,
