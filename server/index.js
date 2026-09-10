@@ -1,5 +1,5 @@
 import { sql } from "@vercel/postgres";
-import { put } from "@vercel/blob";
+import { put, list } from "@vercel/blob";
 import { handleUpload } from "@vercel/blob/client";
 import { OAuth2Client } from "google-auth-library";
 import { createHash, createHmac } from "node:crypto";
@@ -44,6 +44,7 @@ const APP_SECRET = String(process.env.TDT_APP_SECRET || process.env.TDT_ADMIN_TO
 if (!APP_SECRET || APP_SECRET.length < 32) {
   // Fail only when a protected endpoint is called; health/build should remain usable.
 }
+const adminToken = { value: () => APP_SECRET };
 const configuredProjectKey = { value: () => String(process.env.TDT_PROJECT_KEY || "tiktok-tai-dep-trai") };
 const configuredExtensionId = { value: () => String(process.env.TDT_EXTENSION_ID || "") };
 const LEASE_MS = 90_000;
@@ -154,16 +155,32 @@ function cacheUpdateRelease(value) {
 }
 
 
+function setHeaders(response, headers = {}) {
+  for (const [name, value] of Object.entries(headers)) {
+    if (value !== undefined && value !== null) response.setHeader(name, String(value));
+  }
+}
+
 function sendJson(response, status, payload, extraHeaders = {}) {
-  response.status(status);
-  response.set({
+  // Vercel Node functions expose the standard Node ServerResponse API.
+  // Do not depend on Express-only helpers such as res.set()/res.send().
+  if (response.writableEnded) return;
+  response.statusCode = Number(status) || 200;
+  setHeaders(response, {
     "Content-Type": "application/json; charset=utf-8",
     "Cache-Control": "no-store",
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "no-referrer",
     ...extraHeaders
   });
-  response.send(JSON.stringify(payload));
+  response.end(JSON.stringify(payload));
+}
+
+function redirect(response, status, location) {
+  if (response.writableEnded) return;
+  response.statusCode = Number(status) || 302;
+  response.setHeader("Location", String(location || "/"));
+  response.end();
 }
 
 function requestPath(request) {
@@ -249,10 +266,10 @@ async function handlePublicUpdateDownload(request, response) {
   const requested = validReleaseVersion(new URL(request.originalUrl || request.url || "/", `https://${request.headers.host || "localhost"}`).searchParams.get("version"));
   if (requested && requested !== release.version) return sendJson(response, 404, { ok: false, error: "Phiên bản này không còn là bản phát hành mới nhất." });
   if (!release.storagePath) {
-    response.redirect(302, release.downloadUrl || DEFAULT_UPDATE_RELEASE.downloadUrl);
+    redirect(response, 302, release.downloadUrl || DEFAULT_UPDATE_RELEASE.downloadUrl);
     return;
   }
-  response.redirect(302, release.storagePath || release.downloadUrl || DEFAULT_UPDATE_RELEASE.downloadUrl);
+  redirect(response, 302, release.storagePath || release.downloadUrl || DEFAULT_UPDATE_RELEASE.downloadUrl);
 }
 
 async function publishUpdateRelease(body) {
@@ -286,8 +303,8 @@ async function publishUpdateRelease(body) {
     mandatory: body.mandatory !== false,
     releaseNotes: cleanText(body.releaseNotes, 6000) || `Phát hành TikTok by TDT v${version}.`,
     publishedAt: new Date(now).toISOString(),
-    downloadUrl: `${PUBLIC_BASE_URL}/api/v1/extension/download?version=${encodeURIComponent(version)}`,
-    releasePageUrl: `${PUBLIC_BASE_URL}/extension/`,
+    downloadUrl: `${VERCEL_BASE_URL}/api/v1/extension/download?version=${encodeURIComponent(version)}`,
+    releasePageUrl: `${VERCEL_BASE_URL}/extension/`,
     updatedAt: now,
     broadcastId: `${version}-${now}`
   });
@@ -379,7 +396,7 @@ async function handleAdminLogin(request, response) {
 function extensionCors(request, response) {
   const expectedId = cleanText(configuredExtensionId.value(), 64);
   const expectedOrigin = expectedId ? `chrome-extension://${expectedId}` : "*";
-  response.set({
+  setHeaders(response, {
     "Access-Control-Allow-Origin": expectedOrigin,
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     "Access-Control-Allow-Headers": "Authorization, Content-Type",
@@ -387,7 +404,8 @@ function extensionCors(request, response) {
     Vary: "Origin"
   });
   if (request.method === "OPTIONS") {
-    response.status(204).send("");
+    response.statusCode = 204;
+    response.end();
     return true;
   }
   return false;
