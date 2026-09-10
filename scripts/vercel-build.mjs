@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
 import archiver from "archiver";
 
 const DEFAULT_BASE_URL = "https://tdt-tiktok.vercel.app";
-const EXTENSION_VERSION = "4.0.1";
+const EXTENSION_VERSION = "4.0.2";
 const DEFAULT_EXTENSION_ID = "cpndheccadlhkiogcfdhagomiadbaogn";
 const required = ["public/index.html", "public/admin/index.html", "api/health.js", "server/index.js"];
 for (const file of required) if (!existsSync(file)) throw new Error(`Missing required deployment file: ${file}`);
@@ -22,7 +22,7 @@ try {
 const basePattern = `${baseOrigin}/*`;
 const extensionId = String(process.env.TDT_EXTENSION_ID || DEFAULT_EXTENSION_ID).trim();
 
-writeFileSync("public/config.js", `window.TDT_CONFIG=${JSON.stringify({ googleClientId: clientId, baseUrl: baseOrigin })};\n`);
+writeFileSync("public/config.js", `window.TDT_CONFIG=${JSON.stringify({ googleClientId: clientId, baseUrl: baseOrigin, googleAuthOrigin: baseOrigin })};\n`);
 
 const releaseDir = join("public", "extension", "releases");
 mkdirSync(releaseDir, { recursive: true });
@@ -75,7 +75,7 @@ const latest = {
   version: EXTENSION_VERSION,
   downloadUrl: `${baseOrigin}/api/v1/extension/download?version=${encodeURIComponent(EXTENSION_VERSION)}`,
   releasePageUrl: `${baseOrigin}/extension/`,
-  releaseNotes: "v4.0.1: sửa Google Sign-In dùng đúng deployment tdt-tiktok.vercel.app và đồng bộ origin theo PUBLIC_BASE_URL.",
+  releaseNotes: "v4.0.2: sửa snapshot.exists và thêm chẩn đoán Google OAuth origin bắt buộc.",
   publishedAt: new Date().toISOString(),
   sha256: createHash("sha256").update(bytes).digest("hex"),
   mandatory: true,

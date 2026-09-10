@@ -17,10 +17,10 @@ function start() {
     callback: async (r) => {
       try {
         const p = await exchange(r.credential);
-        send({ action: "result", ...p, version: "4.0.1" });
+        send({ action: "result", ...p, version: "4.0.2" });
         setTimeout(() => close(), 500);
       } catch (e) {
-        send({ action: "result", ok: false, error: e.message, version: "4.0.1" });
+        send({ action: "result", ok: false, error: e.message, version: "4.0.2" });
       }
     }
   });

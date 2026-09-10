@@ -4,7 +4,20 @@ function safeSetHeader(response, name, value) {
 }
 
 export default async function handler(request, response) {
-  const payload = { ok: true, service: "tdt-control-vercel", version: "4.0.3", time: Date.now() };
+  const baseUrl = String(process.env.PUBLIC_BASE_URL || "https://tdt-tiktok.vercel.app").replace(/\/$/, "");
+  let googleOrigin = baseUrl;
+  try { googleOrigin = new URL(baseUrl).origin; } catch {}
+  const googleClientId = String(process.env.GOOGLE_CLIENT_ID || "").trim();
+  const payload = {
+    ok: true,
+    service: "tdt-control-vercel",
+    version: "4.0.4",
+    time: Date.now(),
+    googleAuth: {
+      configured: Boolean(googleClientId && !googleClientId.includes("__GOOGLE_CLIENT_ID__")),
+      authorizedJavascriptOriginRequired: googleOrigin
+    }
+  };
   try {
     if (response?.writableEnded) return;
     response.statusCode = 200;

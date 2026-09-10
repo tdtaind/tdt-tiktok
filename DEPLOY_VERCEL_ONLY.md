@@ -54,3 +54,12 @@ The first API request creates the Vercel Postgres schema.
 
 ## 7. Existing Firebase data
 This build does not contact Firebase and therefore cannot silently copy the old Firebase data. If historical users/settings/sync records must be preserved, export them from the old system and import them into Vercel Postgres before switching production traffic.
+
+
+## Google OAuth origin bắt buộc (v4.0.4)
+
+Nếu Google hiện `401 invalid_client` và `no registered origin`, mở Google Cloud Console > APIs & Services > Credentials > OAuth 2.0 Client IDs > Web application client đang dùng bởi `GOOGLE_CLIENT_ID`, rồi thêm **Authorized JavaScript origins**:
+
+`https://tdt-tiktok.vercel.app`
+
+Origin không chứa path `/auth-extension/` và không có dấu `/` cuối.

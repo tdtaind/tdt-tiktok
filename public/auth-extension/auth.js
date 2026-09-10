@@ -7,6 +7,48 @@ function readContext(){const p=new URLSearchParams(location.search),c={extension
 function sendToExtension(c,p){return new Promise((resolve,reject)=>{if(!globalThis.chrome?.runtime?.sendMessage)return reject(new Error("Không kết nối được với extension."));globalThis.chrome.runtime.sendMessage(c.extensionId,{type:"TDT_GOOGLE_AUTH_RESULT_V3",nonce:c.nonce,...p},r=>{if(globalThis.chrome.runtime.lastError)return reject(new Error(globalThis.chrome.runtime.lastError.message));if(!r?.ok)return reject(new Error(r?.error||"Extension từ chối kết quả đăng nhập."));resolve(r);});});}
 async function exchange(credential){const r=await fetch("/api/v1/auth/google",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({credential}),cache:"no-store"});const p=await r.json().catch(()=>({}));if(!r.ok||!p.ok)throw new Error(p.error||"Không thể tạo phiên đăng nhập.");return p;}
 function waitGoogle(){return new Promise((resolve,reject)=>{const start=Date.now();const timer=setInterval(()=>{if(globalThis.google?.accounts?.id){clearInterval(timer);resolve();}else if(Date.now()-start>10000){clearInterval(timer);reject(new Error("Google Sign-In chưa sẵn sàng. Hãy tải lại trang."));}},100);});}
-async function startGoogle(c){await waitGoogle();const holder=document.getElementById("googleHolder")||document.createElement("div");holder.id="googleHolder";holder.style.margin="18px 0";if(!holder.parentNode)document.querySelector("main.card")?.appendChild(holder);google.accounts.id.initialize({client_id:String(CONFIG.googleClientId||""),callback:async r=>{try{const p=await exchange(r.credential);await sendToExtension(c,{ok:true,idToken:p.idToken,refreshToken:p.refreshToken,uid:p.uid,expiresIn:p.expiresIn,email:p.email,displayName:p.displayName,photoURL:p.photoURL,provider:"google.com",version:"4.0.1"});setStatus(`Đăng nhập thành công${p.email?`: ${p.email}`:""}. Cửa sổ sẽ tự đóng.` ,"success");loginButton.hidden=true;if(spinner)spinner.hidden=true;setTimeout(()=>globalThis.close(),700);}catch(e){setStatus(e.message,"error");loginButton.hidden=false;if(spinner)spinner.hidden=true;try{await sendToExtension(c,{ok:false,error:e.message,version:"4.0.1"})}catch{}}}});google.accounts.id.renderButton(holder,{theme:"outline",size:"large",text:"signin_with",shape:"rectangular"});loginButton.hidden=true;if(spinner)spinner.hidden=false;setStatus("Đang mở danh sách tài khoản Google…");}
+async function startGoogle(c){
+  const clientId=String(CONFIG.googleClientId||"").trim();
+  const requiredOrigin=String(CONFIG.googleAuthOrigin||CONFIG.baseUrl||location.origin).replace(/\/$/,"");
+  if(!clientId||clientId.includes("__GOOGLE_CLIENT_ID__")||!clientId.endsWith(".apps.googleusercontent.com")){
+    throw new Error("GOOGLE_CLIENT_ID chưa được cấu hình đúng trên Vercel.");
+  }
+  if(location.origin!==requiredOrigin){
+    throw new Error(`Origin đăng nhập không đúng. Hiện tại: ${location.origin}. Yêu cầu: ${requiredOrigin}.`);
+  }
+  await waitGoogle();
+  const holder=document.getElementById("googleHolder")||document.createElement("div");
+  holder.id="googleHolder";
+  holder.style.margin="18px 0";
+  holder.replaceChildren();
+  if(!holder.parentNode)document.querySelector("main.card")?.appendChild(holder);
+  try{google.accounts.id.cancel();}catch{}
+  google.accounts.id.initialize({
+    client_id:clientId,
+    callback:async r=>{
+      try{
+        const p=await exchange(r.credential);
+        await sendToExtension(c,{ok:true,idToken:p.idToken,refreshToken:p.refreshToken,uid:p.uid,expiresIn:p.expiresIn,email:p.email,displayName:p.displayName,photoURL:p.photoURL,provider:"google.com",version:"4.0.2"});
+        setStatus(`Đăng nhập thành công${p.email?`: ${p.email}`:""}. Cửa sổ sẽ tự đóng.`,"success");
+        loginButton.hidden=true;
+        if(spinner)spinner.hidden=true;
+        setTimeout(()=>globalThis.close(),700);
+      }catch(e){
+        setStatus(e.message,"error");
+        loginButton.hidden=false;
+        if(spinner)spinner.hidden=true;
+        try{await sendToExtension(c,{ok:false,error:e.message,version:"4.0.2"})}catch{}
+      }
+    },
+    ux_mode:"popup",
+    itp_support:true,
+    auto_select:false,
+    cancel_on_tap_outside:false
+  });
+  google.accounts.id.renderButton(holder,{theme:"outline",size:"large",text:"signin_with",shape:"rectangular",width:420});
+  loginButton.hidden=true;
+  if(spinner)spinner.hidden=true;
+  setStatus(`Chọn tài khoản Google. Nếu Google báo “no registered origin”, hãy thêm chính xác ${requiredOrigin} vào Authorized JavaScript origins của OAuth Web Client đang dùng.`);
+}
 let context;try{context=readContext();void startGoogle(context).catch(e=>{setStatus(e.message,"error");loginButton.hidden=false;if(spinner)spinner.hidden=true;});}catch(e){setStatus(e.message,"error");loginButton.hidden=false;if(spinner)spinner.hidden=true;}
 loginButton.addEventListener("click",()=>startGoogle(context||readContext()).catch(e=>setStatus(e.message,"error")));cancelButton.addEventListener("click",()=>globalThis.close());

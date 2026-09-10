@@ -40,6 +40,8 @@ import {
 } from "./update_package.js";
 
 const VERCEL_BASE_URL = String(process.env.PUBLIC_BASE_URL || "https://tdt-tiktok.vercel.app").replace(/\/$/, "");
+const APP_VERSION = "4.0.4";
+const EXTENSION_VERSION = "4.0.2";
 const APP_SECRET = String(process.env.TDT_APP_SECRET || process.env.TDT_ADMIN_TOKEN || "");
 if (!APP_SECRET || APP_SECRET.length < 32) {
   // Fail only when a protected endpoint is called; health/build should remain usable.
@@ -54,16 +56,16 @@ const UPDATE_RELEASE_DOC = "config/updateRelease";
 const UPDATE_REALTIME_PATH = "update";
 const ADMIN_BOOTSTRAP_VERSION = "admin-default-v4.0.2";
 const DEFAULT_UPDATE_RELEASE = Object.freeze({
-  version: "4.0.1",
-  downloadUrl: `${VERCEL_BASE_URL}/extension/releases/TikTok_Tai_Dep_Trai_v4.0.1.zip`,
+  version: EXTENSION_VERSION,
+  downloadUrl: `${VERCEL_BASE_URL}/extension/releases/TikTok_Tai_Dep_Trai_v4.0.2.zip`,
   releasePageUrl: `${VERCEL_BASE_URL}/extension/`,
-  releaseNotes: "v4.0.1: sửa Google Sign-In dùng đúng production domain và đồng bộ origin theo PUBLIC_BASE_URL.",
+  releaseNotes: "v4.0.2: sửa snapshot.exists trên PostgreSQL adapter và thêm chẩn đoán Google OAuth origin.",
   publishedAt: new Date().toISOString(),
-  sha256: "80bbce4aaff1d050287411b831153ba156417a816c2ffd90f627ed8771f4ba46",
+  sha256: "f9873294db5e2a6080c82c05155c95ef664c349570b0fbe3352ee107f8848ee7",
   mandatory: true,
-  filename: "TikTok_Tai_Dep_Trai_v4.0.1.zip",
+  filename: "TikTok_Tai_Dep_Trai_v4.0.2.zip",
   storagePath: "",
-  sizeBytes: 327878,
+  sizeBytes: 327894,
   updatedAt: 0,
   broadcastId: ""
 });
@@ -482,6 +484,26 @@ function validateExtensionIdentity(request, client) {
   }
 }
 
+function googleAuthPublicConfig() {
+  const clientId = String(process.env.GOOGLE_CLIENT_ID || "").trim();
+  let origin = VERCEL_BASE_URL;
+  try { origin = new URL(VERCEL_BASE_URL).origin; } catch {}
+  return {
+    ok: true,
+    configured: Boolean(clientId && !clientId.includes("__GOOGLE_CLIENT_ID__")),
+    origin,
+    authorizedJavascriptOrigin: origin,
+    clientIdHint: clientId ? `${clientId.slice(0, 12)}…${clientId.slice(-24)}` : "",
+    appVersion: APP_VERSION,
+    extensionVersion: EXTENSION_VERSION
+  };
+}
+
+function handleGoogleConfig(request, response) {
+  if (request.method !== "GET") return sendJson(response, 405, { ok: false, error: "Method không được hỗ trợ." });
+  return sendJson(response, 200, googleAuthPublicConfig());
+}
+
 async function verifyGoogleIdToken(token) {
   const clientId = String(process.env.GOOGLE_CLIENT_ID || "").trim();
   if (!clientId) throw Object.assign(new Error("GOOGLE_CLIENT_ID chưa được cấu hình."), { status: 500 });
@@ -653,7 +675,7 @@ function dayKey(timestamp = Date.now()) {
 async function ensureSettings() {
   const reference = realtimeDatabase().ref("settings");
   const snapshot = await reference.get();
-  if (snapshot.exists()) return normalizeSettings(snapshot.val());
+  if (snapshot.exists) return normalizeSettings(snapshot.val());
   const settings = { mode: "whitelist", message: "", updatedAt: Date.now() };
   await reference.set(settings);
   await firestore.doc("config/access").set(settings, { merge: true });
@@ -1055,7 +1077,7 @@ async function handleAdminApi(request, response, pathname) {
     const body = requestBody(request);
     if (body.listState !== undefined && !LIST_STATES.has(body.listState)) return sendJson(response, 400, { ok: false, error: "Danh sách không hợp lệ." });
     const current = serializeUser(snapshot);
-    const currentAccess = accessSnapshot.exists() ? accessSnapshot.val() : { locked: current.locked, listState: current.listState, blockMessage: current.blockMessage, updatedAt: current.updatedAt };
+    const currentAccess = accessSnapshot.exists ? accessSnapshot.val() : { locked: current.locked, listState: current.listState, blockMessage: current.blockMessage, updatedAt: current.updatedAt };
     const access = mergeAccessPatch(currentAccess, body, Date.now());
     const note = body.note === undefined ? current.note : cleanText(body.note, 500);
     // Vercel Database là nguồn quyết định quyền trực tiếp của extension. Ghi vào đây trước
@@ -1083,8 +1105,9 @@ async function handleAdminApi(request, response, pathname) {
 export async function route(request, response) {
   const pathname = requestPath(request);
   if (pathname === "/api/health" || pathname === "/health") {
-    return sendJson(response, 200, { ok: true, service: "tdt-control-vercel", version: "4.0.3", time: Date.now() });
+    return sendJson(response, 200, { ok: true, service: "tdt-control-vercel", version: APP_VERSION, time: Date.now() });
   }
+  if (pathname === "/api/v1/auth/config") return handleGoogleConfig(request, response);
   if (pathname === "/api/v1/auth/google") return handleGoogleExchange(request, response);
   if (pathname === "/api/v1/auth/refresh") return handleExtensionRefresh(request, response);
   if (pathname === "/api/v1/extension/update-manifest") return handlePublicUpdateManifest(request, response);
