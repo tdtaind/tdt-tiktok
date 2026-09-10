@@ -1,0 +1,29 @@
+FIX “MÁY CHỦ CẬP NHẬT PHẢN HỒI HTTP 404”
+
+NGUYÊN NHÂN
+Máy chủ đang chạy Function api cũ, chưa có route /api/v1/extension/update-manifest, hoặc chỉ Hosting mới được cập nhật.
+
+CÁCH DEPLOY NHANH TRÊN macOS
+1. Giải nén gói Dashboard.
+2. Nhấp đúp DEPLOY_FIX_404.command.
+3. Cho phép Terminal/Firebase đăng nhập nếu được hỏi.
+
+HOẶC CHẠY THỦ CÔNG
+npm ci --prefix functions
+npm run check --prefix functions
+npm test --prefix functions
+npx --yes firebase-tools@latest deploy --project tran-duc-tai --only functions:api
+
+BẮT BUỘC DEPLOY ĐẦY ĐỦ LẦN ĐẦU
+Sau lần deploy này, các rewrite đã có pinTag để giữ Hosting và Function đồng bộ.
+
+KIỂM TRA SAU DEPLOY
+- https://tran-duc-tai.web.app/api/health
+  Phải trả version 2.3.4.
+- https://tran-duc-tai.web.app/api/v1/extension/update-manifest
+  Phải trả JSON version 2.6.2, không còn HTTP 404.
+- https://tran-duc-tai.web.app/extension/releases/latest.json
+  Luôn có manifest tĩnh dự phòng.
+
+EXTENSION v2.6.2
+Extension mới không còn phụ thuộc duy nhất vào route API. Nếu API chính lỗi, nó tự dùng Function độc lập, manifest tĩnh hoặc Firebase Realtime.

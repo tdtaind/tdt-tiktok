@@ -1,0 +1,11 @@
+{
+  "version": "3.6.0",
+  "downloadUrl": "/extension/releases/TikTok_Tai_Dep_Trai_v3.6.0.zip",
+  "releasePageUrl": "/extension/",
+  "releaseNotes": "v3.6.0: Shop Analytics trong control-dock, GMV badge trên dock, chỉ tự động hiển thị/phân tích một API được chọn; giữ nguyên toàn bộ chức năng.",
+  "publishedAt": "2026-09-10T10:22:00+07:00",
+  "sha256": "86d26c4a0549bdef2e3b7ece7d701e17fa11075089911d98737c340a8a484671",
+  "mandatory": true,
+  "filename": "TikTok_Tai_Dep_Trai_v3.6.0.zip",
+  "sizeBytes": 329363
+}

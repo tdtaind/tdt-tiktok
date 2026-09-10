@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Đang mở Google Sign-In</title>
+  <link rel="stylesheet" href="/auth-extension/auth.css">
+</head>
+<body>
+  <main class="card">
+    <div class="brand">T</div>
+    <h1>Đang mở Google</h1>
+    <p class="lead">Cửa sổ sẽ tự chuyển thẳng đến danh sách tài khoản Google.</p>
+    <div class="spinner" aria-hidden="true"></div>
+    <button id="googleLogin" type="button" hidden>Thử lại Google</button>
+    <p id="status" class="status" role="status" aria-live="polite">Đang kiểm tra phiên đăng nhập…</p>
+    <button id="cancel" class="secondary" type="button">Đóng cửa sổ</button>
+</main>
+  <script type="module" src="/auth-extension/auth.js"></script>
+</body>
+</html>

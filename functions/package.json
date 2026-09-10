@@ -1,0 +1,27 @@
+{
+  "name": "tdt-firebase-control-functions",
+  "version": "3.0.0",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "engines": {
+    "node": "20"
+  },
+  "scripts": {
+    "check": "node --check index.js && node --check access.js && node --check admin_auth.js && node --check sync_logic.js && node --check update_package.js",
+    "test": "node --test test/*.test.mjs",
+    "preflight": "node scripts/preflight.mjs",
+    "verify": "npm run check && npm run preflight && npm test"
+  },
+  "dependencies": {
+    "@google-cloud/firestore": "8.6.0",
+    "@google-cloud/storage": "7.21.0",
+    "firebase-admin": "14.2.0",
+    "firebase-functions": "7.3.0"
+  },
+  "overrides": {
+    "brace-expansion": "2.1.2",
+    "safer-buffer": "2.1.2",
+    "uuid": "11.1.1"
+  }
+}

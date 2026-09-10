@@ -1,0 +1,41 @@
+TDT FIREBASE CONTROL v2.3.4
+
+1. Giải nén và mở Terminal tại thư mục dự án.
+
+2. Cài dependency sạch (đã sửa lỗi safer-buffer 2.1.3):
+   Chạy file DEPLOY_FIX_FUNCTIONS.command (khuyến nghị), hoặc:
+   NPM_CONFIG_CACHE="${TMPDIR:-/tmp}/tdt-firebase-npm-cache-v234" npm ci --prefix functions
+
+3. Kiểm tra:
+   npm run check --prefix functions
+   npm test --prefix functions
+
+4. Deploy đầy đủ Functions + Hosting + Realtime Database rules + Firestore:
+   npx --yes firebase-tools@latest deploy --project tran-duc-tai
+
+Dashboard admin:
+https://tran-duc-tai.web.app/admin
+
+Cách phát hành phiên bản mới:
+- Mở mục “Cập nhật Extension”.
+- Chọn file ZIP hoặc CRX (tối đa 20 MB).
+- Nhập phiên bản mới và ghi chú.
+- Giữ bật “Bắt buộc cập nhật”.
+- Bấm “Tải lên và gửi yêu cầu cập nhật”.
+
+Hệ thống sẽ lưu file vào Firebase Storage, cập nhật manifest và gửi lệnh realtime đến người dùng. Extension phiên bản cũ tự khóa và hiện popup update.
+
+Lưu ý:
+- Firebase Storage phải được khởi tạo cho project tran-duc-tai.
+- Bản Load unpacked tải ZIP rồi cần giải nén/nạp lại trong chrome://extensions.
+- CRX tự cài im lặng chỉ hoạt động khi được ký đúng private key và triển khai bằng chính sách phù hợp.
+
+
+## Fix HTTP 404 v2.3.2
+Deploy đầy đủ lần đầu bằng DEPLOY_FIX_404.command. Endpoint update dùng Function độc lập và manifest tĩnh dự phòng.
+
+
+ĐỒNG BỘ ONLINE CHO EXTENSION v2.5.1
+- Endpoint: https://tran-duc-tai.web.app/api/v1/extension/sync
+- Phải deploy Function api trước khi cài Extension v2.5.1.
+- Sau deploy, đăng nhập Google trong Extension và bấm “Đồng bộ” ở thanh tài khoản.

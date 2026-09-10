@@ -1,0 +1,14 @@
+TEST REPORT — TDT Firebase Control v3.0.0 HD Hotfix
+
+[PASS] node --check cho Functions và JavaScript public.
+[PASS] 20/20 unit tests: access, admin auth, sync logic và update package.
+[PASS] JSON cấu hình hợp lệ.
+[PASS] Manifest phát hành trỏ đúng TikTok_Tai_Dep_Trai_v3.0.0.zip.
+[PASS] SHA-256 và sizeBytes trong latest.json khớp file ZIP thật.
+[PASS] DEFAULT_UPDATE_RELEASE trong functions/index.js khớp latest.json.
+[PASS] ZIP client hợp lệ và manifest bên trong vẫn version 3.0.0.
+
+GIỚI HẠN MÔI TRƯỜNG
+- Chưa deploy lên Firebase production và chưa đăng nhập TikTok thật trong sandbox.
+- Unit test server, fixture DOM, mô phỏng media hook/API và kiểm tra package đều đã đạt.
+- npm preflight không thể nạp vì sandbox chưa có package firebase-admin; đây là dependency deploy, không phải lỗi cú pháp hoặc unit test.

@@ -1,0 +1,32 @@
+FIX LỖI DEPLOY FUNCTIONS v2.3.2
+
+NGUYÊN NHÂN:
+- package-lock.json ghim brace-expansion@2.1.3, nhưng phiên bản này không tồn tại trên npm.
+- @google-cloud/firestore là optional dependency của firebase-admin nên npm bỏ qua toàn bộ Firestore khi cài thất bại.
+- index.js import firebase-admin/firestore ngay khi khởi động, làm quá trình phân tích/deploy của cả 3 Functions cùng thất bại.
+
+ĐÃ SỬA:
+- Ghim brace-expansion@2.1.2 và safer-buffer@2.1.2 là các phiên bản tồn tại.
+- Khai báo @google-cloud/firestore và @google-cloud/storage thành dependency bắt buộc.
+- Thêm npm run preflight để phát hiện lỗi nạp module trước khi deploy.
+- Chỉ dùng một Function api; bỏ hai Function phụ extensionManifest và extensionDownload.
+- Hosting chuyển toàn bộ /api/** về api.
+- Chuyển runtime Node.js 20 để tương thích ổn định hơn.
+- Deploy Functions trước, Hosting/Rules sau. Hosting sẽ không được deploy nếu api thất bại.
+
+CÁCH CHẠY:
+1. Giải nén gói.
+2. Mở Terminal tại thư mục vừa giải nén.
+3. Chạy:
+   chmod +x DEPLOY_FIX_FUNCTIONS.command
+   ./DEPLOY_FIX_FUNCTIONS.command
+
+HOẶC:
+   npm ci --prefix functions --include=optional
+   npm run verify --prefix functions
+   npx --yes firebase-tools@latest deploy --project tran-duc-tai --only functions:api
+   npx --yes firebase-tools@latest deploy --project tran-duc-tai --only hosting,database,firestore
+
+NẾU CLI HỎI SECRET TDT_ADMIN_TOKEN:
+   openssl rand -hex 32 | npx --yes firebase-tools@latest functions:secrets:set TDT_ADMIN_TOKEN --project tran-duc-tai --data-file -
+Sau đó chạy lại deploy Function api.

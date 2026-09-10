@@ -1,0 +1,17 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "settings": {
+      ".read": "auth != null"
+    },
+    "access": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid"
+      }
+    },
+    "update": {
+      ".read": "auth != null"
+    }
+  }
+}
