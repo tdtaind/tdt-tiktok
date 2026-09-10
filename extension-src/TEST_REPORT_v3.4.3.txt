@@ -1,0 +1,17 @@
+TEST REPORT v3.4.3
+
+Kalodata sales_volume fix:
+- node --check background.js: PASS
+- node --check kalodata_content.js: PASS
+- node --check popup.js: PASS
+- manifest JSON parse: PASS
+- parser direct sales_volume: PASS
+- parser nested data/detail sales_volume: PASS
+- parser camelCase salesVolume: PASS
+- sales_volume = 0 preserved as valid: PASS
+- missing sales_volume preserved as unavailable (not fake 0): PASS
+- Kalodata cache key bumped v1 -> v2: PASS
+
+Compatibility target:
+- Preserve all v3.4.2 permissions, host permissions, extension key and update_url.
+- Preserve EchoTik, Auto Replace HD, Audio Studio and existing feature modules.

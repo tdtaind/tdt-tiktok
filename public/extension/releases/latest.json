@@ -1,11 +1,11 @@
 {
-  "version": "3.7.0",
-  "downloadUrl": "/extension/releases/TikTok_Tai_Dep_Trai_v3.7.0.zip",
+  "version": "4.0.0",
+  "downloadUrl": "/api/v1/extension/download?version=4.0.0",
   "releasePageUrl": "/extension/",
-  "releaseNotes": "v3.7.0 Vercel-only: toàn bộ API điều khiển, đăng nhập extension và cập nhật extension dùng domain Vercel; giữ nguyên chức năng gốc.",
+  "releaseNotes": "Vercel-only: API, Google Sign-In, database, storage và cập nhật extension chạy trên Vercel; không còn phụ thuộc Firebase.",
   "publishedAt": "2026-09-10T10:30:00+07:00",
-  "sha256": "90a5390f19343a3bcf740c9ab1d6caa344df2e3427ef7ecb8d4d2654743d993e",
+  "sha256": "80bbce4aaff1d050287411b831153ba156417a816c2ffd90f627ed8771f4ba46",
   "mandatory": true,
-  "filename": "TikTok_Tai_Dep_Trai_v3.7.0.zip",
-  "sizeBytes": 332196
+  "filename": "TikTok_Tai_Dep_Trai_v4.0.0.zip",
+  "sizeBytes": 327878
 }

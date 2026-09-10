@@ -1,0 +1,40 @@
+TIKTOK TÀI ĐẸP TRAI — RELEASE NOTES v3.2.3
+===========================================
+
+Mục tiêu
+- Fix triệt để hiện tượng một số video trên trang chính TikTok có hình nhưng không có tiếng.
+- Khôi phục avatar/tim/comment/favorite/share khi video nguồn là landscape 16:9.
+- Giữ nguyên toàn bộ chức năng v3.2.2.
+
+Thay đổi kỹ thuật chính
+1. Native Audio Bridge
+   - Giữ video TikTok gốc trong DOM làm audio/subtitle clock.
+   - HD replacement là picture path và được hard-mute khi bridge đang hoạt động.
+   - Không còn mute/pause native video quá sớm trong event play.
+   - Đồng bộ play, pause, seek, currentTime, speed và volume.
+   - Tự failover sang direct replacement audio nếu bridge lỗi.
+
+2. Web Audio / Audio Studio
+   - Audio Studio ưu tiên native media khi HD replacement đang bật.
+   - Không force crossorigin trên signed replacement URL.
+   - CORS probe và direct-audio bypass vẫn giữ nguyên.
+   - AudioContext recovery có failover để không để cả feed rơi vào trạng thái silent.
+
+3. Landscape Action Rail
+   - Overlay chỉ phủ native video rectangle.
+   - Bỏ force overflow:hidden trên TikTok target container.
+   - Giữ/nâng TikTok SectionActionBarContainer chứa các action.
+   - Có fallback dock action rail bên phải nếu rail bị render ngoài viewport.
+
+4. Regression protection
+   - Không thay đổi Extension key/permissions/host permissions/update_url.
+   - Không xóa module cũ.
+   - Không thay đổi Transcript365, 1688, Vercel, proxy, Watch Analytics, HD download.
+
+Kiểm thử tĩnh
+- node --check toàn bộ JavaScript: PASS.
+- manifest.json parse: PASS.
+- manifest referenced files: PASS.
+- So sánh inventory với v3.2.2: không mất file chức năng.
+- ZIP integrity: PASS.
+- Selector regression trên HTML TikTok mẫu: tìm thấy feed action rail chứa like/comment/share.

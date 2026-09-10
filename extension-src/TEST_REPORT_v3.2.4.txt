@@ -1,0 +1,25 @@
+TIKTOK TÀI ĐẸP TRAI v3.2.4 - TEST REPORT
+========================================
+
+- JavaScript syntax: PASS (17 files)
+- manifest.json parse/version: PASS (3.2.4)
+- Manifest referenced files: PASS (13 unique refs)
+- v3.2.3 file inventory preservation: PASS (no previous file removed)
+- Audio Studio global active-video supervisor markers: PASS
+- Collection/grid preview guard markers: PASS
+- Auto Replace target gate uses collection-wide preview protection: PASS
+- Native Audio Bridge + landscape action rail regression markers: PASS
+- No forced crossorigin on HD replacement: PASS
+- Collection route sanity test incl. uploaded /music case: PASS
+- TikTok saved HTML native-video CORS marker: PASS
+
+Primary regression targets:
+- AUDIO persisted ON: supervisor starts after settings load and scans already-playing videos.
+- play/playing/loadedmetadata/canplay all trigger Audio Studio independently from Auto Replace.
+- Native TikTok CORS media is trusted after successful metadata/canplay instead of being rejected by a redundant probe.
+- /music, /tag, /discover, /effect, /channel, /topic, /search and profile grids are preview-only until a large detail/dialog player opens.
+- Hover preview may receive Audio Studio while remaining the original TikTok player; it never becomes the HD replacement target.
+- Native Audio Bridge, 16:9 action rail, subtitles, downloads, products, analytics and legacy modules are retained.
+
+Runtime note:
+- Static checks cannot emulate every future TikTok DOM/CDN change or Chrome autoplay policy; unsupported cross-origin media remains on native direct audio rather than being force-captured into Web Audio.

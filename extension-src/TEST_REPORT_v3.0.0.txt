@@ -1,0 +1,33 @@
+TEST REPORT — TikTok Tài Đẹp Trai v3.0.0 Main Player Lock Hotfix
+
+ĐÃ KIỂM TRA TỰ ĐỘNG
+[PASS] node --check toàn bộ JavaScript của extension.
+[PASS] Toàn bộ JSON hợp lệ; manifest vẫn version 3.0.0 và giữ nguyên key Extension ID.
+[PASS] Tất cả file JavaScript/HTML/icon được manifest khai báo đều tồn tại.
+[PASS] Fixture tìm kiếm thực tế chứa 80 thẻ video; card đầu tiên đúng @nutty.captain68/video/7595955097838963986.
+[PASS] URL /video/ trong location được ưu tiên khi background vẫn còn URL /search cũ.
+[PASS] Player chính lớn bên trái được chấp nhận khi không có data-video-id trực tiếp.
+[PASS] Video nhỏ ở cột phải bị nhận diện là recommendation bằng hình học dù không có link/ID ổn định.
+[PASS] Candidate có Video ID khác route hiện tại bị từ chối.
+[PASS] Sau khi khóa player chính, một surface lớn ẩn danh khác không thể chiếm phiên.
+[PASS] Toàn bộ dialog không còn được dùng để tìm link khi route đã có /video/.
+[PASS] Fallback dialog ưu tiên URL video chính trước link video đề xuất.
+[PASS] Event play/canplay/loadedmetadata của video phụ bị chặn trước resolver/mount.
+[PASS] Trang /search vẫn không mount thumbnail; chỉ player chi tiết sau click mới hợp lệ.
+[PASS] Nguồn đúng ID được chấp nhận; nguồn thiếu ID hoặc sai ID bị từ chối fail-closed.
+[PASS] 12/12 assertion mô phỏng route-lock và 6/6 source guard checks.
+[PASS] Cấu trúc ZIP, CRC và manifest root được kiểm tra sau đóng gói.
+
+FIREBASE CONTROL
+[PASS] npm run check.
+[PASS] 20/20 unit test Vercel Functions.
+[PASS] Gói extension tích hợp, sizeBytes và SHA-256 trong latest.json/index.js khớp file phát hành.
+
+GIỚI HẠN MÔI TRƯỜNG
+- Không đăng nhập tài khoản TikTok/Vercel production trong sandbox.
+- Kiểm thử dựa trên HTML tìm kiếm thật người dùng cung cấp, ảnh lỗi, mô phỏng layout 1658×928, kiểm tra cú pháp, manifest, ZIP và unit test server.
+
+VIDEO REPLACEMENT REGRESSION FIX
+- Kiểm tra main feed card data-e2e="recommend-list-item-container" không bị nhận nhầm là side recommendation.
+- Kiểm tra right rail/creator video vẫn bị loại bằng semantic + geometry.
+- Kiểm tra route Video ID, search grid, khóa player và cú pháp toàn bộ JS/JSON.

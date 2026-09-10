@@ -1,0 +1,13 @@
+:root{color-scheme:dark;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0d0f14;color:#f8fafc}
+*{box-sizing:border-box}
+body{min-height:100vh;margin:0;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 20% 15%,rgba(37,244,238,.15),transparent 32%),radial-gradient(circle at 82% 78%,rgba(254,44,85,.17),transparent 34%),#0d0f14}
+.welcome{width:min(430px,100%);padding:34px;text-align:center;border:1px solid rgba(255,255,255,.12);border-radius:26px;background:rgba(24,27,35,.86);box-shadow:0 26px 80px rgba(0,0,0,.42);backdrop-filter:blur(18px)}
+.logo{width:68px;height:68px;margin:0 auto 18px;display:grid;place-items:center;border-radius:20px;background:linear-gradient(135deg,#25f4ee,#fe2c55);font-size:34px;font-weight:900;box-shadow:0 12px 32px rgba(254,44,85,.25)}
+h1{margin:0 0 10px;font-size:29px}p{margin:0 0 20px;color:#cbd5e1;line-height:1.55}
+button,a{width:100%;min-height:46px;border:0;border-radius:13px;font-weight:800;font-size:15px;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:10px}
+button{background:#fff;color:#111827}button:hover{background:#f1f5f9}button:disabled{opacity:.62;cursor:wait}
+button span{width:25px;height:25px;display:grid;place-items:center;border-radius:50%;background:#4285f4;color:#fff;font-weight:900}
+.status{min-height:42px;margin:17px 0 13px;padding:11px 13px;border-radius:12px;background:rgba(255,255,255,.06);font-size:13px}
+.status.ok{color:#86efac;background:rgba(34,197,94,.1)}.status.error{color:#fda4af;background:rgba(244,63,94,.1)}
+#openTikTok{background:linear-gradient(135deg,#25f4ee,#fe2c55);color:#fff;margin-top:10px}
+small{display:block;margin-top:19px;color:#64748b}

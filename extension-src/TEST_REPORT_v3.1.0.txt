@@ -1,0 +1,50 @@
+TEST REPORT — TikTok Tài Đẹp Trai v3.1.0
+
+Ngày build: 2026-08-17
+Phạm vi: kiểm tra tĩnh/source + tính toàn vẹn gói extension trong môi trường build.
+
+[PASS] Syntax JavaScript
+- node --check PASS cho toàn bộ file .js trong extension.
+
+[PASS] Manifest JSON
+- manifest.json parse hợp lệ.
+- version = 3.1.0.
+- Giữ nguyên key Extension ID của v3.0.0.
+- Giữ nguyên permissions, host_permissions, content_scripts, background service worker,
+  content_security_policy và update_url của v3.0.0.
+
+[PASS] File manifest
+- Các content script, popup và background file được tham chiếu trong manifest đều tồn tại.
+
+[PASS] Thanh điều khiển video mới
+- Timeline: buffered + played + thumb + seek input.
+- Phát/Tạm dừng + current time / duration.
+- Volume + slider.
+- Speed menu 0.5x–4x.
+- Camera/snapshot.
+- Clean Mode.
+- Picture-in-Picture.
+- Web fullscreen.
+- Browser fullscreen.
+
+[PASS] Đồng bộ trạng thái
+- Progress cập nhật theo timeupdate/seeked/loadedmetadata/durationchange.
+- Icon play/pause cập nhật theo trạng thái video.
+- PiP button cập nhật enterpictureinpicture/leavepictureinpicture.
+- Web fullscreen giữ host khi video được render lại và khôi phục overflow khi thoát.
+
+[PASS] Không lặp thanh timeline cũ
+- DOM progress-bar cũ đã được thay bằng tpt-ctrlbar mới; không tạo đồng thời 2 thanh tiến trình của extension.
+
+[PASS] Giữ chức năng lõi
+- Kiểm tra marker chức năng: Transcript365, TikTok Subtitle Translator, tải HD,
+  1688 image search, Clean Mode, Watch Analytics và Remote Usage vẫn còn trong source.
+
+[PASS] Chụp khung hình cải tiến
+- Ưu tiên ClipboardItem PNG như bản cũ.
+- Nếu Clipboard API không khả dụng/bị chặn, fallback tự lưu PNG.
+
+LƯU Ý KIỂM THỬ RUNTIME
+- Môi trường build không đăng nhập TikTok thật, nên các luồng phụ thuộc tài khoản/TikTok API/CDN,
+  Transcript365, Vercel/proxy và DOM TikTok live cần reload extension rồi test trên trình duyệt người dùng.
+- Build không thay đổi key/update_url hoặc quyền truy cập của bản gốc.

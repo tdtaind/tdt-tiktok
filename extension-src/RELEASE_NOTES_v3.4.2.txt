@@ -1,0 +1,10 @@
+TikTok Tài Đẹp Trai v3.4.2 FINAL
+
+- Giữ nguyên toàn bộ chức năng v3.4.1.
+- Fix lỗi "Đường dẫn Kalodata Open API không hợp lệ" khi dùng URL tài liệu chính thức https://www.kalodata.com/open-center/docs.
+- URL /open-center/docs giờ được nhận diện là Documentation URL và tự quy về /openapi/v1/video/detail trên cùng origin.
+- Chuẩn hóa URL có /openapi, /openapi/v1, full endpoint hoặc path website Kalodata mà không nối trùng.
+- Giữ hỗ trợ API gateway/subdomain Kalodata/Kalowave có base-path riêng.
+- Thông báo 404 mới phân biệt rõ Documentation URL với API host/gateway riêng.
+- Popup hiển thị endpoint đã suy ra sau khi lưu.
+- Không thay đổi permission, extension key, update_url, EchoTik hoặc các module media/TikTok khác.

@@ -1,0 +1,46 @@
+TIKTOK TÀI ĐẸP TRAI — RELEASE NOTES v3.2.6
+===========================================
+
+Mục tiêu
+- Giữ nguyên toàn bộ chức năng v3.2.5.
+- Sửa race condition Audio Studio khi TikTok tái sử dụng cùng <video> cho clip/source mới.
+- Sửa captureStream giữ audio track cũ sau khi source đổi.
+- Sửa volume captureStream có thể tạo đường loa trực tiếp thứ hai / âm lượng không ổn định.
+- Giảm timer/DOM scan dư thừa để feed chạy nhẹ hơn.
+
+Thay đổi kỹ thuật
+1. Source-aware Audio Studio attach
+   - Promise tạo engine được gắn với source URL + generation.
+   - Kết quả CORS/AudioContext đến muộn của clip cũ bị bỏ qua nếu source đã đổi.
+   - Không để promise cũ gắn Web Audio lên clip mới khi TikTok recycle node.
+
+2. Rebuild captureStream đúng source
+   - Phát hiện engine capture-stream có sourceUrl khác currentSrc/src.
+   - Dừng track cũ và dựng lại engine cho source mới.
+   - MediaElementSource vẫn được giữ trên cùng node và re-validate source mới.
+
+3. Capture volume fail-safe
+   - Khi captureStream đang chạy, volume slider điều khiển gain graph thay vì unmute HTMLVideoElement.
+   - Tránh duplicate/direct speaker path gây âm lượng gấp đôi, chập chờn hoặc thay đổi ngẫu nhiên.
+   - Giữ đúng playbackVolume khi fallback captureStream được dùng cho replacement video.
+
+4. Adaptive Normalizer + Spatial 360
+   - Không reset normalizerGain về 1 trong mỗi vòng supervisor.
+   - Không clear/recreate normalizer/spatial interval liên tục.
+   - Spatial motion giữ phase liên tục, giảm timer churn và CPU.
+
+5. Hiệu năng SPA
+   - Audio Studio supervisor từ 700 ms -> 1200 ms; event play/playing/canplay/loadedmetadata vẫn xử lý ngay.
+   - MutationObserver chỉ gọi audio scan khi DOM mutation thật sự liên quan player/video.
+   - Giảm querySelectorAll("video") và timer churn trong feed nhiều mutation.
+
+Giữ nguyên
+- Auto Replace HD và quy tắc không thay hover/grid preview.
+- Player portrait/square/landscape; avatar/tim/comment/share native vẫn được giữ.
+- Screenshot, Clean Mode, PiP, Web Fullscreen, Fullscreen.
+- EQ 8 band, preset, Adaptive Normalizer, Spatial 360°.
+- Transcript365, TikTok Subtitle Translator, dịch VI.
+- HD Download, video info, stats, Watch Analytics.
+- 1688 Image Search, Product Tools, proxy, Vercel/remote access.
+- Background Play, Smart Auto Pause, auto-scroll.
+- Extension key, permissions, host permissions và update_url.

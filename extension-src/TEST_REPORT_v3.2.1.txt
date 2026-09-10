@@ -1,0 +1,25 @@
+TIKTOK TÀI ĐẸP TRAI — TEST REPORT v3.2.1
+
+STATIC / INTEGRITY CHECKS
+[PASS] manifest.json parses correctly and version = 3.2.1.
+[PASS] Extension key preserved exactly from v3.2.0.
+[PASS] permissions / host_permissions / content_scripts / background / action preserved.
+[PASS] No file from v3.2.0 FINAL is missing.
+[PASS] JavaScript syntax checked by node --check for 16 files.
+[PASS] Audio attach waits for HAVE_METADATA before createMediaElementSource.
+[PASS] Cross-origin media must be CORS-confirmed before Web Audio capture.
+[PASS] Dry passthrough is connected before the effect chain.
+[PASS] Dry/Wet fail-safe exists for AUDIO on/off and processing errors.
+[PASS] Captured media keeps AudioContext recovery active even when AUDIO is switched off, so dry passthrough cannot remain suspended.
+[PASS] CORS failure after Web Audio capture rebuilds a fresh video element for original audio.
+[PASS] AudioContext recovery is wired for play/user interaction/focus/pageshow/visibility changes/background continuation.
+[PASS] Late error events from stale video elements are ignored.
+
+FILE COMPATIBILITY
+Missing files: none
+Changed existing files: README.txt, content.js, manifest.json, popup.html
+Unchanged existing files: 30 files
+Added documentation/tests: RELEASE_NOTES_v3.2.1.txt, TEST_REPORT_v3.2.1.txt
+
+NOTE
+Automated checks validate source integrity and failure-path logic. A headless audio smoke test was not used because the container's headless Chromium audio process did not complete reliably. TikTok/CDN/Vercel/account-dependent behavior should be verified in the user's real Chrome session after reloading the unpacked extension.

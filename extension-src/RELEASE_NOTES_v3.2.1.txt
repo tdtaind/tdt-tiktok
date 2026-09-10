@@ -1,0 +1,25 @@
+TIKTOK TÀI ĐẸP TRAI — RELEASE NOTES v3.2.1
+
+MỤC TIÊU
+- Fix triệt để lỗi mất âm thanh sau khi bật Audio Studio hoặc khi đổi video/tab.
+- Giữ nguyên toàn bộ chức năng của v3.2.0.
+
+THAY ĐỔI
+1. Audio Studio Safe Attach
+   - Chỉ tạo MediaElementSource sau khi video đã HAVE_METADATA.
+   - Với nguồn cross-origin, chỉ attach sau khi browser đã load thành công với crossorigin.
+
+2. Dry/Wet Fail-Safe
+   - Nối dry passthrough vào destination ngay sau khi tạo MediaElementSource.
+   - Nếu EQ, analyser, compressor hoặc spatial node lỗi, tự chuyển về âm thanh gốc thay vì im tiếng.
+
+3. AudioContext Recovery
+   - Tự resume sau play, pointer/keyboard interaction, focus, pageshow và quay lại tab.
+   - Tự đồng bộ lại Audio Studio sau khi context quay về running.
+
+4. CORS Audio Recovery
+   - Ghi nhớ nguồn HD chặn CORS/Web Audio.
+   - Nếu phần tử video đã bị Web Audio capture mà nguồn lỗi CORS, dựng phần tử video mới không Web Audio để đảm bảo âm thanh gốc.
+
+5. Giữ nguyên tính năng
+   - Player, subtitle/Transcript365, dịch VI, HD download, 1688, product tools, Watch Analytics, Vercel/proxy, PiP, fullscreen, Clean Mode, tốc độ phát và các chức năng hiện có không bị loại bỏ.

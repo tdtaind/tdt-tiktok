@@ -1,0 +1,178 @@
+{
+  "manifest_version": 3,
+  "name": "TikTok Tài Đẹp Trai",
+  "version": "4.0.0",
+  "description": "TikTok Tài Đẹp Trai v3.6.0: Shop Analytics nằm trong control-dock, badge GMV trực tiếp trên dock, chỉ tự hiển thị/phân tích một API được chọn; giữ nguyên toàn bộ chức năng.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmVIGT5Qhgl+q/s9apFXyTRnmTalkAkYzfArj12kKN8BpHRJsbzMBaeoX09P/bFpt4IikASSgB+2VoDujkFHDF/f9RcVdbmdt3FfO/QJC8DBOJH7WY6VyhNWOvUE9yklB6U/Iu98tGAifPk295B0bmX2PtjUOdzIih6wJ1C9XDunHYtqJlTUqTxnfUY5H4mS1Y8VdqaeYyxz/lj4JKzY3bodw1kOnWJ/jK1ziTncRfP6qlLjA+gvLvE4Mq5np8EF3qXJGcHP9iu0kQbuEJy+Oh4CZfgBrFAdxy95hSM4G4VIzC/Q7n/CVnixYqrhmAlNlNpLlcKBuJm/unP/zakz3CQIDAQAB",
+  "permissions": [
+    "storage",
+    "downloads",
+    "tabs",
+    "windows",
+    "alarms",
+    "clipboardWrite",
+    "proxy",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://tiktok.com/*",
+    "https://*.tiktok.com/*",
+    "https://tikwm.com/*",
+    "https://translate.googleapis.com/*",
+    "https://translate.google.com/*",
+    "https://transcript365.com/*",
+    "https://*.transcript365.com/*",
+    "https://api.proxyscrape.com/*",
+    "https://identitytoolkit.googleapis.com/*",
+    "https://tdt-vercel-control.vercel.app/*",
+    "https://*.tiktokcdn.com/*",
+    "https://*.tiktokcdn-us.com/*",
+    "https://*.byteimg.com/*",
+    "https://*.byteoversea.com/*",
+    "https://*.ibytedtos.com/*",
+    "https://*.tiktokv.com/*",
+    "https://*.muscdn.com/*",
+    "https://1688.com/*",
+    "https://*.1688.com/*",
+    "https://*.bytefcdn-oversea.com/*",
+    "https://*.tiktokcdn-eu.com/*",
+    "https://open.echotik.live/*",
+    "https://api.keyapi.ai/*",
+    "https://kalodata.com/*",
+    "https://*.kalodata.com/*",
+    "https://kalowave.com/*",
+    "https://*.kalowave.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; frame-src https://tdt-vercel-control.vercel.app"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://tiktok.com/*",
+        "https://*.tiktok.com/*"
+      ],
+      "js": [
+        "audio_main.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://tiktok.com/*",
+        "https://*.tiktok.com/*"
+      ],
+      "js": [
+        "search_filter_hook.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://tiktok.com/*",
+        "https://*.tiktok.com/*"
+      ],
+      "js": [
+        "content.js",
+        "search_translate.js",
+        "search_filter.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://tiktok.com/*",
+        "https://*.tiktok.com/*"
+      ],
+      "js": [
+        "shop_analytics_content.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://tiktok.com/*",
+        "https://*.tiktok.com/*"
+      ],
+      "js": [
+        "image_search_1688.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://shop.tiktok.com/*",
+        "https://*.shop.tiktok.com/*"
+      ],
+      "js": [
+        "image_search_1688.js"
+      ],
+      "all_frames": true,
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://transcript365.com/*",
+        "https://*.transcript365.com/*"
+      ],
+      "js": [
+        "transcript365_hook.js"
+      ],
+      "all_frames": true,
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://transcript365.com/*",
+        "https://*.transcript365.com/*"
+      ],
+      "js": [
+        "transcript365_bridge.js"
+      ],
+      "all_frames": true,
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://1688.com/*",
+        "https://*.1688.com/*"
+      ],
+      "js": [
+        "image_search_1688_main.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://1688.com/*",
+        "https://*.1688.com/*"
+      ],
+      "js": [
+        "image_search_1688_bridge.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "externally_connectable": {
+    "matches": [
+      "https://tdt-vercel-control.vercel.app/*"
+    ]
+  },
+  "update_url": "https://tdt-vercel-control.vercel.app/extension/updates.xml"
+}

@@ -31,7 +31,7 @@ async function payload(response) {
 
 let response = await fetchWithRetry(`${serverUrl}/api/health`);
 const health = await payload(response);
-assert.equal(health.service, "tdt-firebase-control");
+assert.equal(health.service, "tdt-vercel-control");
 assert.equal(health.version, "3.0.0");
 
 response = await fetchWithRetry(`${serverUrl}/api/v1/extension/update-manifest`);
@@ -97,7 +97,7 @@ if (response.ok) {
     },
     body: JSON.stringify({ projectKey: "tiktok-tai-dep-trai", clientId, client: { version: "production-smoke", extensionId }, counters: { heartbeats: 1 } })
   });
-  assert.equal(response.status, 403, "Backend phải từ chối Firebase Anonymous Auth.");
+  assert.equal(response.status, 403, "Backend phải từ chối Vercel Anonymous Auth.");
   const rejected = await response.json();
   assert.match(rejected.error || "", /Google/);
   anonymousRejected = true;

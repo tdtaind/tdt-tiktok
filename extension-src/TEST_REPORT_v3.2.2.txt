@@ -1,0 +1,31 @@
+TIKTOK TÀI ĐẸP TRAI — TEST REPORT v3.2.2
+==================================================
+
+STATIC / INTEGRITY CHECKS
+[PASS] manifest.json parses correctly and version = 3.2.2.
+[PASS] Extension key preserved from v3.2.1.
+[PASS] permissions preserved from v3.2.1.
+[PASS] host_permissions preserved from v3.2.1.
+[PASS] background/action/externally_connectable/update_url preserved from v3.2.1.
+[PASS] Existing v3.2.1 content_scripts preserved; only audio_main.js MAIN-world probe was added.
+[PASS] Every file referenced by manifest.json exists.
+[PASS] No file from the v3.2.1 package was removed.
+[PASS] JavaScript syntax checked with node --check.
+[PASS] audio_main.js MAIN-world CORS probe is present.
+[PASS] Active-video Audio Studio guard is present.
+[PASS] Web Audio CORS verification occurs before createMediaElementSource().
+[PASS] Direct-audio rebuild recovery is present for suspended AudioContext / captured CORS failures.
+[PASS] Autoplay error classification distinguishes policy errors from network/codec/abort errors.
+[PASS] Replacement video only receives crossOrigin when Audio Studio needs it.
+[PASS] UI version strings updated to v3.2.2.
+
+AUDIO FAILURE MODES ADDRESSED
+- Random silence from capturing TikTok preview/recycled video elements.
+- Silence caused by unsafe cross-origin MediaElementSource creation.
+- Silence when an already captured element is attached to a suspended AudioContext.
+- Playback state/currentTime loss during non-CORS fallback reload.
+- Transient activation lost by awaiting Audio Studio initialization before calling video.play().
+- Muted fallback incorrectly triggered for non-autoplay playback errors.
+
+RUNTIME LIMITATION
+Static checks cannot reproduce every TikTok account/CDN/region source URL, Chrome Media Engagement state, Vercel endpoint or third-party Transcript365 response. Final runtime validation should therefore be performed after reloading the extension in Chrome on the affected TikTok account/profile.

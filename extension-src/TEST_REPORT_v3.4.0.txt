@@ -1,0 +1,18 @@
+TikTok Tài Đẹp Trai v3.4.0 - Test report
+
+[PASS] JavaScript syntax: all *.js via node --check.
+[PASS] manifest.json parses successfully.
+[PASS] Every JS file referenced by manifest exists.
+[PASS] Every popup.js getElementById(...) reference exists in popup.html.
+[PASS] No v3.3.0 permission removed.
+[PASS] No v3.3.0 host permission removed; only kalodata.com + *.kalodata.com added.
+[PASS] Extension public key unchanged.
+[PASS] update_url unchanged.
+[PASS] Kalodata Video Detail wired to POST /openapi/v1/video/detail.
+[PASS] Kalodata authentication wired to secret-key header.
+[PASS] Request body includes region, language, currency, date_range, video_id.
+[PASS] Kalodata cache/in-flight/timeout are separate from EchoTik.
+[PASS] Chromium headless smoke-load produced no extension manifest/service-worker errors; environment DBus messages only.
+[PASS] ZIP integrity checked after packaging.
+
+Live Kalodata response cannot be verified without the Enterprise/Open API Base URL and Access Key issued for the user's account.

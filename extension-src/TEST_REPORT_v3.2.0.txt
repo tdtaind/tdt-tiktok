@@ -1,0 +1,30 @@
+TIKTOK TÀI ĐẸP TRAI — TEST REPORT v3.2.0
+=========================================
+
+STATIC VALIDATION
+[PASS] manifest.json parses correctly and version = 3.2.0.
+[PASS] All JavaScript files pass `node --check`.
+[PASS] Every manifest-referenced JS/background/popup/icon file exists.
+[PASS] No file present in v3.1.0 FINAL is missing from v3.2.0.
+[PASS] ZIP archive integrity test passes.
+
+CONTROL BAR v3.2
+[PASS] Aspect profiles exist: portrait / square / landscape.
+[PASS] Width-density profiles exist: regular / compact / micro.
+[PASS] Control bar keeps all v3.1 actions: Play/Pause, seek, volume, speed,
+       snapshot, Clean Mode, PiP, Web Fullscreen, Fullscreen.
+[PASS] Timeline retains buffered + played + thumb + hover time tooltip.
+[PASS] Caption and metadata bottom offsets are adjusted to the compact bar.
+
+AUDIO STUDIO v3.2
+[PASS] Shared AudioContext + per-video processing chain implementation exists.
+[PASS] Engine attaches to replacement video and active/visible native TikTok videos.
+[PASS] Play / loadedmetadata / canplay paths re-apply Audio Studio after switching video.
+[PASS] Existing engine is retained for TikTok videos that are temporarily detached/reinserted.
+[PASS] Audio disabled state applies neutral EQ/compressor/spatial pass-through.
+[PASS] Cross-origin source without CORS mode is skipped to avoid rerouting it to silent Web Audio.
+[PASS] Suspended AudioContext is not used to reroute autoplay media before a user gesture.
+
+RUNTIME NOTE
+A real TikTok session is still required to validate remote/CDN/Vercel/Transcript365 behavior
+because those paths depend on current account state, TikTok DOM/CDN responses and external services.

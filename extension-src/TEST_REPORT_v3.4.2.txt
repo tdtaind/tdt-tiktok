@@ -1,0 +1,15 @@
+TEST REPORT v3.4.2
+
+PASS - JavaScript syntax: toàn bộ *.js qua node --check.
+PASS - manifest.json parse hợp lệ.
+PASS - manifest script/CSS/popup references tồn tại.
+PASS - URL normalization:
+  https://www.kalodata.com/open-center/docs -> https://www.kalodata.com/openapi/v1/video/detail
+  /openapi -> /openapi/v1/video/detail
+  /openapi/v1 -> /openapi/v1/video/detail
+  /openapi/v1/video/detail giữ nguyên
+  /openapi/v1/video/rank -> /openapi/v1/video/detail
+  API subdomain gateway base-path được giữ lại.
+PASS - permissions không đổi so với v3.4.1.
+PASS - host_permissions không đổi so với v3.4.1.
+PASS - extension key và update_url không đổi.

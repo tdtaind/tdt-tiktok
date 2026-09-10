@@ -1,0 +1,38 @@
+TIKTOK TÀI ĐẸP TRAI v3.0.0 — MAIN PLAYER LOCK HOTFIX
+
+GIỮ NGUYÊN PHIÊN BẢN VÀ TOÀN BỘ CHỨC NĂNG
+- Manifest, Extension ID và phiên bản hiển thị vẫn là 3.0.0.
+- Giữ nguyên player HD, phụ đề/dịch, bộ lọc tìm kiếm, tải video, phím tắt, Watch-time, TikTok Shop, tìm ảnh 1688, proxy, đăng nhập và đồng bộ online.
+
+FIX PLAYER TỰ CHUYỂN SANG VIDEO ĐỀ XUẤT
+- Khóa phiên thay thế vào đúng Video ID và đúng khung video chính đang mở.
+- Video đề xuất, “Video của nhà sáng tạo” và các thumbnail ở cột bên phải không còn được phép chiếm player thay thế.
+- Video phụ không có Video ID vẫn bị loại bằng vị trí, kích thước và cấu trúc right rail.
+- Khi DOM TikTok render lại, extension chờ khung chính mới xuất hiện thay vì gắn tạm vào video đề xuất.
+- Sự kiện play/canplay/loadedmetadata từ video phụ không còn kích hoạt mount, mute hoặc chuyển nguồn.
+
+FIX NHẬN SAI URL VIDEO
+- URL /video/ hiện tại trong thanh địa chỉ được ưu tiên hơn thông báo tab cũ còn giữ URL /search.
+- Không quét toàn bộ dialog để lấy link vì dialog chứa nhiều link video đề xuất khác nhau.
+- Fallback dialog luôn ưu tiên URL video chính đang mở trước các link bên trong danh sách đề xuất.
+- Nguồn API/hook tiếp tục bị từ chối nếu thiếu Video ID hoặc trả về ID khác video đang mở.
+
+GIỮ TRANG TÌM KIẾM CLICK ĐƯỢC
+- Không tự gắn player vào thumbnail/card kết quả tìm kiếm.
+- Chỉ thay thế sau khi người dùng bấm mở đúng video.
+- Preview khi rê chuột và video cột phải vẫn hoạt động native, không chiếm phiên chính.
+
+TỐI ƯU HIỆU NĂNG
+- Loại sớm các video nhỏ ở right rail trước khi tính điểm target hoặc gọi API.
+- Cache target chỉ giữ khung chính hợp lệ và bị xóa khi URL/video thay đổi.
+- Không tiếp tục remount khi player chính đang kết nối, đúng Video ID và còn hiển thị.
+- Giảm các lần quét lại do autoplay của thumbnail đề xuất.
+
+AN TOÀN ÂM THANH
+- Player cũ vẫn được pause, mute, volume=0 và gỡ src khi đóng/chuyển video.
+- Video phụ không bị chọn làm player nên không thể làm âm thanh chính chuyển nhầm sang cột bên phải.
+
+HOTFIX VIDEO REPLACEMENT (2026-08-03)
+- Sửa điều kiện nhận diện cột video đề xuất quá rộng làm video chính trên Đề xuất/For You bị loại nhầm.
+- Giữ khóa player theo Video ID và hình học khung chính; video đề xuất bên phải vẫn không thể chiếm phiên.
+- Không thay đổi version, Extension ID hoặc các chức năng hiện có.

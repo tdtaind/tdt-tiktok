@@ -1,0 +1,47 @@
+TikTok Tài Đẹp Trai v3.5.0 FINAL
+
+MỤC TIÊU
+- Giữ nguyên toàn bộ chức năng v3.4.3.
+- Fix triệt để Kalodata không hiển thị sales_volume/lượt bán.
+- Hợp nhất EchoTik + Kalodata vào một module Analytics nhẹ hơn.
+- Đưa Shop Analytics vào nút API trên thanh điều khiển video.
+- Mở rộng khoảng thời gian và chỉ số cho cả hai nguồn.
+
+KALODATA
+- Parser v3 đọc toàn bộ payload Video Detail, không dừng ở object chứa video_id.
+- Đọc đúng sales_volume nếu field nằm ở sibling/nested object hoặc JSON-string.
+- Hỗ trợ snake_case/camelCase và số định dạng K/M/B/T, dấu phẩy/chấm.
+- Phân biệt sales_volume = 0 với field bị thiếu.
+- Hiển thị sales field path + revenue field path để kiểm chứng response.
+- Hiển thị Sales, Revenue, Views, Sales/1K, Sales/View, Revenue/đơn,
+  Video GPM, Product count, Ads Views, Organic Views, Ads Share,
+  Ads ROAS, Ads Period, Revenue/1K, creator/video metadata.
+- Range: last7Day, last30Day và 18 tháng gần nhất dạng YYYY-MM.
+- Cache đổi sang v3 để loại bỏ cache parser cũ.
+
+ECHOTIK
+- Giữ Legacy username/password để tương thích cấu hình cũ.
+- Thêm API Key hiện tại (KeyAPI) với Bearer auth.
+- Video Detail: tổng Sales/GMV/Views/engagement.
+- Video Trends: tính chênh lệch snapshot để lấy Sales/GMV theo khoảng ngày.
+- Range: Lifetime, 1/3/7/14/30 ngày, custom date (tối đa 31 ngày).
+- Hiển thị Sales, GMV, Views, Sales/1K, GMV/đơn, Likes, Comments,
+  Shares, Favorites, Engagement, Like/Comment/Share rate, Sales flag,
+  ngày đăng, duration, resolution, creator, region, source, freshness.
+- Legacy range 1/7/30 ngày dùng view/like period fields; Sales/GMV legacy
+  được ghi chú rõ là lifetime để tránh hiểu sai.
+
+UI / PERFORMANCE
+- Bỏ 2 floating widget cũ; chỉ load shop_analytics_content.js.
+- Dùng 1 MutationObserver + 1 scan timer cho cả EchoTik/Kalodata.
+- Nút API được chèn vào thanh điều khiển custom player; nếu Auto Replace tắt,
+  dùng nút API compact cạnh video native.
+- Panel chỉ mở khi bấm API, không che video khi không sử dụng.
+- Đổi range trực tiếp trong panel và chỉ refresh provider được đổi.
+- Clean Mode tiếp tục ẩn Analytics.
+
+TƯƠNG THÍCH
+- Không bỏ permission nào.
+- Không bỏ host_permission nào.
+- Giữ nguyên extension key và update_url.
+- Chỉ thêm https://api.keyapi.ai/* để hỗ trợ EchoTik API Key hiện tại.

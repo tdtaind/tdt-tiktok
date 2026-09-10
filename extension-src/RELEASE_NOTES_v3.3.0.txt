@@ -1,0 +1,42 @@
+TIKTOK TÀI ĐẸP TRAI — RELEASE NOTES v3.3.0
+===========================================
+
+Mục tiêu
+- Giữ nguyên toàn bộ chức năng v3.2.6.
+- Bổ sung phân tích doanh số/lượt bán video TikTok Shop qua EchoTik API.
+- Không để request EchoTik ảnh hưởng player, Auto Replace, Audio Studio hoặc các observer hiện có.
+
+Tính năng mới
+1. EchoTik API client trong background service worker
+   - Basic Authentication username/password.
+   - GET Batch Video Detail endpoint.
+   - Timeout 12 giây, bắt lỗi 401/403/429/HTTP/server.
+   - Dedupe request cùng Video ID.
+   - Cache local 5-180 phút; tối đa 120 Video ID.
+
+2. EchoTik widget độc lập trên TikTok
+   - Tự tìm Video ID của video đang phát/hiển thị.
+   - Không phụ thuộc Auto Replace.
+   - Shadow DOM giảm xung đột CSS với TikTok.
+   - Tự ẩn khi Clean Mode bật.
+   - Làm mới thủ công bỏ qua cache.
+
+3. Chỉ số phân tích
+   - Lượt bán ước tính.
+   - GMV ước tính.
+   - Views.
+   - Lượt bán / 1.000 views.
+   - GMV trung bình / lượt bán.
+   - Like, comment, engagement.
+
+4. Popup cấu hình
+   - Bật/tắt EchoTik Analytics.
+   - Username/password API.
+   - Cache 5/15/30/60/180 phút.
+   - Nút phân tích video hiện tại.
+
+An toàn & tương thích
+- EchoTik credential lưu ở chrome.storage.local và không được thêm vào allowlist Online Sync/Vercel hiện có.
+- Credential không được chèn vào DOM/trang TikTok; Authorization header chỉ được tạo trong background service worker.
+- Host permission chỉ bổ sung https://open.echotik.live/*.
+- Giữ nguyên extension key và update_url.

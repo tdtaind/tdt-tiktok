@@ -1,0 +1,10 @@
+TikTok Tài Đẹp Trai v3.4.3 FINAL
+
+- Fix Kalodata không hiển thị lượt bán dù Video Detail có sales_volume.
+- Parser Kalodata đọc metric theo chiều sâu trong data/detail/metrics, không dừng sớm ở wrapper có video_id.
+- Hỗ trợ sales_volume snake_case/camelCase và một số alias response tương thích.
+- Parser số hỗ trợ JSON number, numeric string, dấu phân cách và K/M/B/T.
+- Phân biệt sales_volume thiếu với sales_volume = 0; field thiếu hiển thị — thay vì 0 giả.
+- Trả salesSourceField để chẩn đoán field API thực tế.
+- Nâng cache Kalodata v1 -> v2 để bỏ cache 0 sai của các bản trước.
+- Giữ nguyên EchoTik, Auto Replace HD, Audio Studio và toàn bộ chức năng hiện có.

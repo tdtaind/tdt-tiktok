@@ -1,6 +1,6 @@
 TDT FIREBASE CONTROL v3.0.0 — HD HOTFIX
 
-- Giữ nguyên phiên bản Firebase Control 3.0.0 và toàn bộ API/chức năng hiện có.
+- Giữ nguyên phiên bản Vercel Control 3.0.0 và toàn bộ API/chức năng hiện có.
 - Đặt TikTok Tài Đẹp Trai v3.0.0 HD Hotfix làm bản cập nhật bắt buộc mặc định.
 - Gói client mới sửa thay thế video trang chủ, chỉ hiển thị player thay thế, chặn âm thanh video cũ và xác thực Video ID.
 - Cập nhật file phát hành, SHA-256, dung lượng, release notes và thời gian xuất bản.

@@ -1,0 +1,39 @@
+TIKTOK TÀI ĐẸP TRAI v3.3.0 — TEST REPORT
+=========================================
+
+PASS — BACKWARD COMPATIBILITY
+- So sánh manifest với v3.2.6 gốc: không mất permission nào.
+- Không mất host_permission cũ; chỉ thêm https://open.echotik.live/*.
+- Extension key giữ nguyên.
+- update_url giữ nguyên.
+- Các content script cũ vẫn giữ nguyên; EchoTik được thêm bằng content script độc lập.
+
+PASS — SOURCE / MANIFEST / UI
+- node --check: toàn bộ file *.js không lỗi cú pháp.
+- manifest.json parse hợp lệ.
+- Toàn bộ file được manifest tham chiếu đều tồn tại.
+- Các src/href local trong HTML đều tồn tại.
+- Toàn bộ getElementById tĩnh trong popup.js có ID tương ứng trong popup.html.
+- EchoTik content script đã được đăng ký trên tiktok.com và *.tiktok.com.
+
+PASS — ECHOTIK INTEGRATION
+- Background handler ECHOTIK_VIDEO_ANALYTICS tồn tại.
+- Basic Auth được tạo trong background service worker.
+- Endpoint: https://open.echotik.live/api/v3/echotik/video/detail.
+- Query video_ids được tạo từ Video ID đã validate 10-25 chữ số.
+- Timeout 12 giây; xử lý riêng 401/403/429 và HTTP error.
+- Dedupe request cùng Video ID khi không force refresh.
+- Cache local có TTL cấu hình và giới hạn 120 Video ID.
+- Cache write được serialize để tránh lost update khi nhiều video trả dữ liệu gần nhau.
+- Mapper sample đã test: total_video_sale_cnt -> sales; total_video_sale_gmv_amt -> gmv; total_views_cnt -> views.
+- Video ID parser đã test với ID thuần và URL /@user/video/{id}.
+
+PASS — PRIVACY / SYNC
+- tdt_echotik_settings_v1 không được thêm vào allowlist Online Sync/Vercel hiện có.
+- Password không được chèn vào DOM TikTok; Authorization header chỉ được tạo ở background.
+- EchoTik data cache dùng chrome.storage.local.
+
+LƯU Ý TEST THỰC TẾ
+- Không thực hiện live request EchoTik vì package không chứa username/password API của người dùng.
+- EchoTik Batch Video Detail là dữ liệu offline/ước tính; video chưa được EchoTik thu thập có thể trả về không có dữ liệu.
+- Sau khi Load unpacked bản mới, cần reload tab TikTok cũ để content script EchoTik được inject.

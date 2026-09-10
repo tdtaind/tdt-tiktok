@@ -1,0 +1,34 @@
+TIKTOK TÀI ĐẸP TRAI — RELEASE NOTES v3.2.5
+===========================================
+
+Mục tiêu
+- Không để replacement HD im tiếng khi native TikTok bị pause/mute.
+- Không để một lỗi Audio Studio tạm thời blacklist cả <video> khi TikTok tái sử dụng node.
+- Audio Studio có fallback thứ hai cho same-origin/blob video khi createMediaElementSource không khả dụng.
+
+Thay đổi kỹ thuật
+1. Replacement-first audio fail-safe
+   - nativeAudioBridgeActive mặc định false.
+   - replacement bắt đầu bằng playbackVolume thật, không hard-mute.
+   - native bridge chỉ activate sau khi audioEngines có engine running.
+   - bridge failure/suspended context => chuyển ngay về direct replacement audio.
+
+2. Source-scoped bypass
+   - tdtAudioBypassSource xác định đúng URL/source gây lỗi.
+   - source mới tự xóa bypass cũ.
+   - emptied xóa cờ bypass/CORS cũ.
+   - sửa trường hợp TikTok recycle <video> khiến Audio Studio chỉ hoạt động clip đầu.
+
+3. Dual Audio Studio input
+   - Tier 1: MediaElementAudioSourceNode.
+   - Tier 2: captureStream + MediaStreamAudioSourceNode cho same-origin/blob.
+   - Không dùng captureStream để vượt CORS; cross-origin không sạch vẫn dùng direct audio.
+
+4. Suspend-safe capture fallback
+   - Khi AudioContext suspend, capture-stream engine trả direct speaker path trước.
+   - Context resume => graph được engage lại.
+   - Native bridge có watchdog 240 ms.
+
+5. Regression
+   - Giữ nguyên Auto Replace/preview routing v3.2.4.
+   - Giữ nguyên player UI và toàn bộ module cũ.

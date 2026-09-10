@@ -1,4 +1,4 @@
-TEST REPORT — TDT Firebase Control v3.0.0 HD Hotfix
+TEST REPORT — TDT Vercel Control v3.0.0 HD Hotfix
 
 [PASS] node --check cho Functions và JavaScript public.
 [PASS] 20/20 unit tests: access, admin auth, sync logic và update package.
@@ -9,6 +9,6 @@ TEST REPORT — TDT Firebase Control v3.0.0 HD Hotfix
 [PASS] ZIP client hợp lệ và manifest bên trong vẫn version 3.0.0.
 
 GIỚI HẠN MÔI TRƯỜNG
-- Chưa deploy lên Firebase production và chưa đăng nhập TikTok thật trong sandbox.
+- Chưa deploy lên Vercel production và chưa đăng nhập TikTok thật trong sandbox.
 - Unit test server, fixture DOM, mô phỏng media hook/API và kiểm tra package đều đã đạt.
-- npm preflight không thể nạp vì sandbox chưa có package firebase-admin; đây là dependency deploy, không phải lỗi cú pháp hoặc unit test.
+- npm preflight không thể nạp vì sandbox chưa có package vercel-admin; đây là dependency deploy, không phải lỗi cú pháp hoặc unit test.

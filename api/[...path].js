@@ -1,4 +1,4 @@
-import { route } from "../functions/index.js";
+import { route } from "../server/index.js";
 
 export const config = {
   api: {

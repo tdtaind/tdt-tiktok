@@ -1,0 +1,56 @@
+TIKTOK TÀI ĐẸP TRAI — RELEASE NOTES v3.2.2
+==================================================
+
+MỤC TIÊU
+- Giữ nguyên toàn bộ chức năng của v3.2.1.
+- Sửa lỗi nhiều video lúc có âm thanh, lúc bị mất âm thanh.
+- Khi video chạy, extension luôn thử phát có tiếng trước; không yêu cầu click trực tiếp vào video để bật tiếng.
+- Làm Audio Studio an toàn hơn với cơ chế tải video động/recycle của TikTok.
+
+CẢI TIẾN ÂM THANH
+1. SOUND-FIRST MEDIA LOAD
+- Không còn ép crossOrigin="anonymous" lên mọi video khi Audio Studio đang tắt.
+- Chỉ bật CORS cho replacement video khi Audio Studio thực sự cần Web Audio.
+- Nguồn không phù hợp Web Audio sẽ chạy đường âm thanh trực tiếp để ưu tiên không mất tiếng.
+
+2. ACTIVE-VIDEO AUDIO ENGINE
+- Audio Studio chỉ bám video đang phát/thực sự hoạt động thay vì capture hàng loạt video preview/paused trong DOM TikTok.
+- Tránh createMediaElementSource() trên các video TikTok đang bị virtualize/recycle ngoài màn hình.
+
+3. MAIN-WORLD CORS PROBE
+- Thêm audio_main.js chạy MAIN world.
+- Kiểm tra CORS của URL media ngay từ ngữ cảnh trang TikTok trước khi createMediaElementSource().
+- Nếu probe không an toàn, bỏ qua Web Audio cho nguồn đó thay vì có nguy cơ silence.
+
+4. TỰ PHỤC HỒI KHI AUDIOCONTEXT BỊ SUSPEND
+- Tự resume AudioContext khi có thể.
+- Nếu video hiện tại đã bị Web Audio capture nhưng context vẫn suspend sau nhiều lần thử, extension tạo replacement video mới với direct audio.
+- Giữ lại thời gian đang xem, volume, tốc độ và trạng thái phát khi chuyển sang direct audio.
+
+5. AUTOPLAY CÓ TIẾNG TỐT HƠN
+- Luôn thử play có tiếng trước.
+- Chỉ dùng muted fallback khi trình duyệt trả lỗi autoplay-policy/NotAllowedError.
+- Không coi lỗi mạng/codec/AbortError là lỗi autoplay âm thanh.
+- Bất kỳ tương tác hợp lệ nào trên trang (pointer/keyboard) đều được dùng để unlock; không cần click trực tiếp lên video.
+- play() được gọi đồng bộ ngay trong event gesture để không làm mất transient user activation vì chờ Promise/Web Audio setup.
+
+6. CORS FALLBACK KHÔNG LÀM MẤT TRẠNG THÁI VIDEO
+- Khi phải reload nguồn không-CORS, tự khôi phục currentTime, trạng thái phát, volume và tốc độ.
+- Nếu nguồn đã bị Web Audio capture thì không cố tái sử dụng element đó; tạo element mới để thoát MediaElementSource an toàn.
+
+AUDIO STUDIO GIỮ NGUYÊN
+- Equalizer 8 bands.
+- Volume Normalizer / compressor.
+- Spatial / 360° Audio.
+- Dry/Wet routing, analyzer và các cài đặt hiện có.
+
+CHỨC NĂNG KHÁC GIỮ NGUYÊN
+- Thanh điều khiển video dọc/ngang/vuông.
+- HD Download, Transcript365, Subtitle Translator, dịch VI.
+- 1688 Image Search, Product Tools, Watch Analytics, thống kê.
+- Clean Mode, Screenshot, PiP, Web Fullscreen, Fullscreen.
+- Vercel, proxy, remote config, background play, Smart Auto Pause và các module hiện có.
+- Extension key, permissions, host permissions, update_url và các content script cũ được giữ nguyên; chỉ bổ sung audio_main.js để probe CORS.
+
+LƯU Ý VỀ AUTOPLAY
+Chrome có chính sách riêng đối với autoplay có âm thanh. Extension không thể hợp lệ ép Chrome phát tiếng nếu profile/origin chưa được trình duyệt cho phép. v3.2.2 loại bỏ yêu cầu phải click trực tiếp vào video: nếu TikTok đã có quyền autoplay có tiếng thì video phát tiếng ngay; nếu chưa, tương tác hợp lệ bất kỳ trên trang sẽ được tận dụng để unlock tự động.

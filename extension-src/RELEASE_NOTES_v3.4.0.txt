@@ -1,0 +1,11 @@
+TikTok Tài Đẹp Trai v3.4.0 FINAL
+
+- Giữ nguyên toàn bộ chức năng v3.3.0.
+- Bổ sung Kalodata Open API Video Detail Analytics.
+- POST /openapi/v1/video/detail với header secret-key.
+- Cấu hình Base URL, Access Key, region, language, currency, date_range, cache.
+- Hiển thị doanh thu/revenue, lượt bán, views, GPM, Ads ROAS, Ads views, số ngày chạy ads, số sản phẩm.
+- Cache/chống request trùng, timeout và xử lý 401/403/429 độc lập với EchoTik.
+- Kalodata và EchoTik có thể bật/tắt độc lập.
+- Credential Kalodata chỉ lưu chrome.storage.local, không đồng bộ Vercel.
+- Chỉ cho phép API Base URL thuộc kalodata.com.

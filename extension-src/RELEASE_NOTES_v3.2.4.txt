@@ -1,0 +1,31 @@
+TIKTOK TÀI ĐẸP TRAI — RELEASE NOTES v3.2.4
+===========================================
+
+Mục tiêu
+- Fix Audio Studio chỉ hoạt động trên một số video / bỏ qua video khi Auto Replace bật.
+- Fix HD replacement bám vào video hover/preview ở music/profile/search/tag/discover và các grid tương tự.
+- Giữ nguyên toàn bộ chức năng v3.2.3.
+
+Thay đổi chính
+1. Audio Studio Global Active-Video Supervisor
+   - Tách shouldAttachAudioToVideo khỏi autoReplace và preview classification.
+   - Bắt play, playing, loadedmetadata, canplay, DOM mutation.
+   - Supervisor 700ms quét lại các video đang phát để xử lý trường hợp TikTok recycle DOM hoặc event xảy ra trước khi settings load.
+   - Persisted AUDIO được áp dụng ngay khi extension khởi tạo.
+   - Tối đa 10 active video candidates, chỉ capture video có metadata và qua CORS safety gate.
+
+2. Native CORS trust
+   - Với native TikTok video đã loadedmetadata/canplay trong CORS mode, không bắt buộc fetch HEAD/Range probe lần hai.
+   - Replacement/foreign URL vẫn giữ strict probe để tránh MediaElementAudioSource bị silent.
+
+3. Preview Guard toàn trang
+   - Collection routes: music/tag/discover/effect/channel/topic/search/profile.
+   - Hover preview/card/grid được giữ native.
+   - Chỉ large dialog/detail/main feed player mới đủ điều kiện Auto Replace.
+   - Lifecycle tự đóng replacement khi quay về grid.
+
+4. Regression protection
+   - Native Audio Bridge giữ nguyên.
+   - Action rail landscape giữ nguyên.
+   - Không đổi extension key/permissions/host permissions/update_url.
+   - Không xóa module cũ.

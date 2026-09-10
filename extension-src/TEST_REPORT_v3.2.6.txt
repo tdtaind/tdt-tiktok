@@ -1,0 +1,18 @@
+TIKTOK TÀI ĐẸP TRAI v3.2.6 — STATIC TEST REPORT
+================================================
+
+PASS
+- node --check: toàn bộ file *.js không lỗi cú pháp.
+- manifest.json parse hợp lệ.
+- Toàn bộ content script/service worker/icon/popup/offscreen file được manifest tham chiếu đều tồn tại.
+- Không thay đổi extension key.
+- Không xóa permission/host_permission/update_url.
+- Auto Replace/preview routing không bị chỉnh sửa.
+- Audio engine pending promise đã source-aware.
+- captureStream engine phát hiện source change và rebuild.
+- Adaptive Normalizer timer idempotent.
+- Spatial timer idempotent.
+- MutationObserver audio scan được giới hạn theo video/player mutation.
+
+LƯU Ý
+- Đây là kiểm tra source/static trong môi trường sandbox. TikTok là SPA thay đổi liên tục, nên vẫn nên smoke-test trên Chrome/Edge thật với tài khoản và các loại trang bạn đang dùng.

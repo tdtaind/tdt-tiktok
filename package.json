@@ -1,16 +1,17 @@
 {
   "private": true,
-  "name": "tdt-firebase-control-vercel",
-  "version": "3.7.0",
+  "name": "tdt-control-vercel-only",
+  "version": "4.0.0",
   "type": "module",
   "scripts": {
     "vercel-build": "node scripts/vercel-build.mjs",
-    "check": "node --check api/[...path].js && node --check functions/index.js && node --check functions/access.js && node --check functions/admin_auth.js && node --check functions/sync_logic.js && node --check functions/update_package.js"
+    "check": "node --check api/[...path].js && node --check server/index.js && node --check server/access.js && node --check server/admin_auth.js && node --check server/sync_logic.js && node --check server/update_package.js"
   },
   "dependencies": {
-    "@google-cloud/firestore": "8.6.0",
-    "@google-cloud/storage": "7.21.0",
-    "firebase-admin": "14.2.0"
+    "@vercel/blob": "2.0.0",
+    "@vercel/postgres": "0.10.0",
+    "google-auth-library": "10.3.0",
+    "archiver": "7.0.1"
   },
   "engines": {
     "node": ">=20"

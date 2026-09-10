@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TikTok by TDT</title>
+  <link rel="stylesheet" href="popup.css">
+  <script src="popup.js" defer></script>
+</head>
+<body>
+  <main class="app">
+    <header class="header">
+      <div class="logo">T</div>
+      <div class="identity">
+        <h1>TikTok by TDT</h1>
+        <p>@tranductai</p>
+      </div>
+      <button id="versionUpdateButton" class="version version-button" type="button" aria-expanded="false" title="Thông tin phiên bản và cập nhật"><span id="headerVersionText">v3.6.0</span><i id="headerUpdateDot" class="header-update-dot" hidden></i></button>
+    </header>
+
+    <section class="card private-update-card version-update-panel" id="privateUpdateCard" hidden>
+      <div class="private-update-head">
+        <div class="private-update-icon" aria-hidden="true">↻</div>
+        <div><h2>Thông tin phiên bản</h2><p id="privateUpdateServer">tran-duc-tai.web.app</p></div>
+        <span id="privateUpdateBadge" class="private-update-badge" data-state="idle">TỰ ĐỘNG</span>
+      </div>
+      <div class="private-update-version-row">
+        <div><small>Đang sử dụng</small><strong id="privateUpdateCurrent">3.6.0</strong></div>
+        <span aria-hidden="true">→</span>
+        <div><small>Mới nhất</small><strong id="privateUpdateLatest">Đang kiểm tra…</strong></div>
+      </div>
+      <p id="privateUpdateStatus" class="private-update-status">Đang kết nối máy chủ cập nhật…</p>
+      <p id="privateUpdateNotes" class="private-update-notes" hidden></p>
+      <label class="setting private-update-toggle"><span><b>Tự tải bản cập nhật</b><small>Bản bắt buộc luôn được tải tự động để bảo vệ tính tương thích.</small></span><input id="privateUpdateAutoDownload" type="checkbox" checked><i></i></label>
+      <div class="private-update-actions">
+        <button id="privateUpdateCheck" type="button">Kiểm tra</button>
+        <button id="privateUpdateApply" class="primary" type="button" disabled>Cập nhật</button>
+        <button id="privateUpdateRelease" type="button">Chi tiết</button>
+      </div>
+    </section>
+
+    <section id="authGate" class="card auth-card">
+      <div class="auth-logo">G</div>
+      <div class="auth-copy"><h2>Đăng nhập để sử dụng</h2><p>Đăng nhập Google một lần để kích hoạt extension.</p></div>
+      <button id="googleLogin" class="google-login" type="button">Đăng nhập Google</button>
+      <p id="authError" class="auth-error"></p>
+    </section>
+
+    <section id="accountBar" class="account-bar" hidden>
+      <img id="accountAvatar" alt="Ảnh tài khoản Google">
+      <div class="account-copy">
+        <strong id="accountName">Tài khoản Google</strong>
+        <small id="accountEmail"></small>
+        <span id="accountStatus">Đang xác minh quyền…</span>
+        <span id="accountSyncStatus" class="sync-status">Dữ liệu tài khoản được lưu online</span>
+      </div>
+      <div class="account-actions">
+        <button id="accountSyncNow" type="button" title="Đồng bộ dữ liệu tài khoản ngay">Đồng bộ</button>
+        <button id="googleLogout" type="button">Đăng xuất</button>
+      </div>
+    </section>
+
+    <section id="watchCard" class="card watch-card">
+      <div class="watch-card-head">
+        <div class="watch-clock-icon" aria-hidden="true">◷</div>
+        <div><strong id="watchTodayTime">0s</strong><span><b id="watchTodayVideos">0</b> videos today</span></div>
+      </div>
+      <div class="watch-tabs" role="group" aria-label="Watch-time">
+        <button id="watchDashboardBtn" class="active" type="button">Tổng quan</button>
+        <button id="watchHistoryBtn" type="button">Lịch sử xem</button>
+      </div>
+      <div id="watchDashboardPanel" class="watch-panel">
+        <div class="watch-summary-grid">
+          <div><span>Today</span><strong id="watchSummaryTodayVideos">0 videos</strong><b id="watchSummaryTodayTime">0s</b></div>
+          <div><span>Last 7 days</span><strong id="watchSummary7Videos">0 videos</strong><b id="watchSummary7Time">0s</b></div>
+          <div><span>All-time</span><strong id="watchSummaryAllVideos">0 videos</strong><b id="watchSummaryAllTime">0s</b></div>
+        </div>
+        <div id="watchChart" class="watch-mini-chart" aria-label="Thời gian xem 7 ngày"></div>
+      </div>
+    </section>
+
+    <section class="quick-grid">
+      <button id="scan" class="primary" type="button">↻ Quét video</button>
+      <button id="get-sub" class="secondary accent" type="button">CC Lấy sub</button>
+    </section>
+    <p id="status" class="status">Đang kiểm tra tab TikTok…</p>
+
+    <section class="card proxy-card">
+      <h2>TikTok Proxy · Chuyển vùng</h2>
+      <label class="setting"><span><b>Chuyển vùng riêng TikTok</b><small>Chỉ các miền TikTok dùng proxy; website khác vẫn kết nối trực tiếp.</small></span><input id="tiktokProxyEnabled" type="checkbox"><i></i></label>
+      <div class="proxy-country" role="group" aria-label="Chọn quốc gia proxy">
+        <button type="button" data-proxy-country="vn" title="Việt Nam"><span>🇻🇳</span> Việt Nam</button>
+        <button type="button" data-proxy-country="th" title="Thái Lan"><span>🇹🇭</span> Thái Lan</button>
+        <button type="button" data-proxy-country="kh" title="Campuchia"><span>🇰🇭</span> Campuchia</button>
+      </div>
+      <div class="proxy-status-row">
+        <div><strong id="proxyState" class="proxy-state">Đang kiểm tra…</strong><small id="proxyEndpoint">HTTP · SOCKS4 · SOCKS5</small></div>
+        <button id="rotateProxy" class="proxy-action" type="button">Đổi proxy</button>
+      </div>
+      <p class="proxy-note">Chọn một proxy ngẫu nhiên và giữ nguyên đến khi bạn bấm đổi. Độ trễ proxy đang dùng được cập nhật realtime khi mở popup.</p>
+    </section>
+
+    <section class="card">
+      <h2>Video & phụ đề</h2>
+      <label class="setting"><span><b>Luôn thay video</b><small>Hiển thị video thay thế trên TikTok.</small></span><input id="autoReplace" type="checkbox"><i></i></label>
+      <label class="setting"><span><b>Dùng TikTok Subtitle Translator</b><small>Đồng bộ phụ đề dịch của extension này lên video thay thế và tự tắt Transcript365.</small></span><input id="placeBelowSubtitleTranslator" type="checkbox"><i></i></label>
+      <label class="setting"><span><b>Tự lấy phụ đề</b><small>Lấy sub từ Transcript365.</small></span><input id="scanSubtitles" type="checkbox"><i></i></label>
+      <label class="setting"><span><b>Dịch sang tiếng Việt</b><small>Tự dịch sau khi lấy sub.</small></span><input id="translateVietnamese" type="checkbox"><i></i></label>
+      <label class="setting"><span><b>Nhớ sub trong 24 giờ</b><small>Không quét lại video đã xử lý.</small></span><input id="useSubtitleCache" type="checkbox"><i></i></label>
+      <label class="setting"><span><b>Tự phát video</b><small>Phát khi video và sub đã sẵn sàng.</small></span><input id="autoplay" type="checkbox"><i></i></label>
+      <label class="setting"><span><b>Tự động cuộn video tiếp theo</b><small>Khi video phát hết sẽ tự chuyển sang video kế tiếp; tạm dừng nếu bảng bình luận đang mở.</small></span><input id="autoScrollEnabled" type="checkbox"><i></i></label>
+      <label class="setting"><span><b>Tự đóng Transcript365</b><small>Đóng cửa sổ nền sau khi hoàn tất.</small></span><input id="autoCloseTranscriptWindow" type="checkbox"><i></i></label>
+      <label class="setting"><span><b>Clean Mode</b><small>Ẩn chữ, phụ đề, thống kê và toàn bộ nút phủ trên video.</small></span><input id="cleanMode" type="checkbox"><i></i></label>
+      <label class="setting"><span><b>Hiện tdt-vstats</b><small>Bật hoặc ẩn bảng ngày đăng, lượt xem và tỷ lệ tương tác trên video.</small></span><input id="showVideoStats" type="checkbox"><i></i></label>
+      <label class="setting"><span><b>Hiện video-meta</b><small>Bật hoặc ẩn tên tài khoản, dấu xác minh và caption ở góc dưới video.</small></span><input id="showVideoMeta" type="checkbox"><i></i></label>
+      <label class="setting"><span><b>Widget thông tin sản phẩm</b><small>Tự quét sản phẩm được gắn trong video TikTok Shop.</small></span><input id="productWidgetEnabled" type="checkbox"><i></i></label>
+      <label class="setting"><span><b>Widget bộ đếm xem</b><small>Hiển thị thời gian và số video hôm nay cạnh nút T; nút T vẫn giữ chức năng cũ.</small></span><input id="watchWidgetEnabled" type="checkbox"><i></i></label>
+
+      <label class="range-setting" for="fontSize"><span>Cỡ chữ phụ đề</span><output id="fontSizeValue">22px</output></label>
+      <input id="fontSize" class="range" type="range" min="12" max="42" step="1">
+
+      <label class="range-setting" for="subtitleOpacity"><span>Nền phụ đề</span><output id="subtitleOpacityValue">72%</output></label>
+      <input id="subtitleOpacity" class="range" type="range" min="0" max="95" step="5">
+    </section>
+
+    <section class="card analytics-dock-card" id="analyticsDockCard">
+      <div class="echotik-title-row"><div><h2>Shop Analytics · control-dock</h2><small>Chỉ hiển thị một nguồn API trên video để giao diện gọn và giảm request.</small></div><span class="analytics-dock-badge">GMV</span></div>
+      <label class="setting"><span><b>Hiển thị GMV trên control-dock</b><small>GMV của video xuất hiện trực tiếp thành badge trên thanh control-dock; bấm để mở bảng chi tiết.</small></span><input id="shopAnalyticsDockEnabled" type="checkbox"><i></i></label>
+      <label class="field analytics-provider-field"><span>Nguồn API hiển thị</span><select id="shopAnalyticsProvider"><option value="echotik">EchoTik</option><option value="kalodata">Kalodata</option></select></label>
+      <p class="echotik-note">Chỉ provider được chọn mới tự gọi API khi video thay đổi. Provider còn lại vẫn giữ nguyên cấu hình và vẫn có thể bấm <b>Phân tích video hiện tại</b> trong popup.</p>
+    </section>
+
+    <section class="card echotik-card" id="echotikCard">
+      <div class="echotik-title-row"><div><h2>EchoTik Shop Analytics</h2><small>Sales · GMV · Views · Engagement · khoảng thời gian linh hoạt</small></div><span class="echotik-api-badge">API</span></div>
+      <label class="setting"><span><b>Bật EchoTik Analytics</b><small>Có thể dùng làm nguồn GMV trên control-dock hoặc phân tích thủ công từ popup.</small></span><input id="echotikEnabled" type="checkbox"><i></i></label>
+      <div class="echotik-fields">
+        <label class="field full"><span>Chế độ API</span><select id="echotikAuthMode"><option value="auto">Tự động · ưu tiên API Key</option><option value="keyapi">API Key hiện tại</option><option value="legacy">Legacy username/password</option></select></label>
+        <label class="field full"><span>EchoTik / KeyAPI API Key</span><input id="echotikApiKey" type="password" autocomplete="new-password" placeholder="sk_live_... / API key"></label>
+        <label class="field"><span>Legacy username</span><input id="echotikUsername" type="text" autocomplete="off" spellcheck="false" placeholder="EchoTik username"></label>
+        <label class="field"><span>Legacy password</span><input id="echotikPassword" type="password" autocomplete="new-password" placeholder="EchoTik password"></label>
+        <label class="field"><span>Khoảng thời gian</span><select id="echotikRangePreset"><option value="lifetime">Toàn thời gian</option><option value="1d">1 ngày</option><option value="3d">3 ngày</option><option value="7d">7 ngày</option><option value="14d">14 ngày</option><option value="30d">30 ngày</option><option value="custom">Tuỳ chọn ngày</option></select></label>
+        <label class="field"><span>Cache API</span><select id="echotikCacheMinutes"><option value="5">5 phút</option><option value="15">15 phút</option><option value="30">30 phút</option><option value="60">60 phút</option><option value="180">180 phút</option></select></label>
+        <label class="field echo-custom-date"><span>Từ ngày</span><input id="echotikCustomStart" type="date"></label>
+        <label class="field echo-custom-date"><span>Đến ngày</span><input id="echotikCustomEnd" type="date"></label>
+      </div>
+      <div class="echotik-actions"><button id="echotikSave" type="button">Lưu EchoTik</button><button id="echotikAnalyze" class="primary" type="button">Phân tích video hiện tại</button></div>
+      <p id="echotikStatus" class="echotik-status">Có thể dùng API Key hiện tại hoặc tài khoản Legacy.</p>
+      <p class="echotik-note">API Key cho phép lấy biến động Sales/GMV theo khoảng ngày qua Video Trends; Legacy vẫn được giữ để tương thích cấu hình cũ. Credential chỉ lưu local, không đồng bộ Vercel.</p>
+    </section>
+
+    <section class="card kalodata-card" id="kalodataCard">
+      <div class="echotik-title-row"><div><h2>Kalodata Shop Analytics</h2><small>Video Detail · Sales Volume · Revenue · Ads · GPM</small></div><span class="kalodata-api-badge">OPEN API</span></div>
+      <label class="setting"><span><b>Bật Kalodata Analytics</b><small>Có thể dùng làm nguồn GMV trên control-dock hoặc phân tích thủ công từ popup.</small></span><input id="kalodataEnabled" type="checkbox"><i></i></label>
+      <div class="echotik-fields">
+        <label class="field full"><span>Kalodata API / Docs URL</span><input id="kalodataBaseUrl" type="url" autocomplete="off" spellcheck="false" placeholder="https://www.kalodata.com/open-center/docs"></label>
+        <label class="field full"><span>Open API Access Key</span><input id="kalodataAccessKey" type="password" autocomplete="new-password" placeholder="secret-key / Access Key"></label>
+        <label class="field"><span>Region</span><select id="kalodataRegion"><option>VN</option><option>US</option><option>GB</option><option>ID</option><option>TH</option><option>PH</option><option>MY</option></select></label>
+        <label class="field"><span>Language</span><select id="kalodataLanguage"><option value="vi-VN">vi-VN</option><option value="en-US">en-US</option><option value="zh-CN">zh-CN</option><option value="th-TH">th-TH</option><option value="id-ID">id-ID</option></select></label>
+        <label class="field"><span>Currency</span><select id="kalodataCurrency"><option>VND</option><option>USD</option><option>CNY</option><option>IDR</option><option>THB</option><option>MYR</option></select></label>
+        <label class="field"><span>Khoảng thời gian</span><select id="kalodataDateRange"><option value="last7Day">7 ngày gần nhất</option><option value="last30Day">30 ngày gần nhất</option></select></label>
+        <label class="field full"><span>Cache API</span><select id="kalodataCacheMinutes"><option value="5">5 phút</option><option value="15">15 phút</option><option value="30">30 phút</option><option value="60">60 phút</option><option value="180">180 phút</option></select></label>
+      </div>
+      <div class="echotik-actions"><button id="kalodataSave" type="button">Lưu Kalodata</button><button id="kalodataAnalyze" class="primary kalodata-primary" type="button">Phân tích video hiện tại</button></div>
+      <p id="kalodataStatus" class="echotik-status">Chọn 7 ngày, 30 ngày hoặc một tháng cụ thể.</p>
+      <p class="echotik-note">Parser mới đọc toàn bộ payload Video Detail để không bỏ sót <b>sales_volume</b> khi metric nằm khác nhánh với <b>video_id</b>. Danh sách tháng được tạo tự động để bám đúng định dạng <b>YYYY-MM</b> của Open API.</p>
+    </section>
+
+    <section class="card">
+      <h2>Playback</h2>
+      <label class="setting"><span><b>Background Play</b><small>Tiếp tục phát khi chuyển tab.</small></span><input id="backgroundPlay" type="checkbox"><i></i></label>
+      <label class="setting"><span><b>Smart Auto-Pause</b><small>Dừng khi tab khác phát media.</small></span><input id="smartAutoPause" type="checkbox"><i></i></label>
+
+      <div class="field-grid">
+        <label class="field"><span>Tốc độ phát</span>
+          <select id="playbackRate">
+            <option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="0.75">0.75×</option>
+            <option value="1">1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option>
+            <option value="2">2×</option><option value="2.5">2.5×</option><option value="3">3×</option><option value="4">4×</option>
+          </select>
+        </label>
+        <label class="field volume-field" for="playbackVolume"><span>Âm lượng <output id="playbackVolumeValue">100%</output></span>
+          <input id="playbackVolume" class="range" type="range" min="0" max="100" step="1">
+        </label>
+      </div>
+    </section>
+
+    <section id="audioCard" class="card audio-card">
+      <h2>Audio Studio</h2>
+      <label class="setting"><span><b>Bật xử lý AUDIO</b><small>Tự áp dụng cho mọi video TikTok đang phát, kể cả video hover/preview; không cần bấm trực tiếp vào video.</small></span><input id="audioEnabled" type="checkbox"><i></i></label>
+      <div id="audioControls" class="audio-controls">
+        <label class="setting"><span><b>Equalizer 8 băng tần</b><small>Tinh chỉnh từ bass 60 Hz đến treble 8 kHz.</small></span><input id="equalizerEnabled" type="checkbox"><i></i></label>
+        <label class="field full audio-preset"><span>Preset EQ</span>
+          <select id="eqPreset">
+            <option value="flat">Flat</option><option value="bass">Bass Boost</option><option value="vocal">Vocal</option>
+            <option value="rock">Rock</option><option value="pop">Pop</option><option value="electronic">Electronic</option>
+            <option value="treble">Treble</option><option value="soft">Soft</option><option value="custom">Custom</option>
+          </select>
+        </label>
+        <div id="eqGrid" class="eq-grid" aria-label="Equalizer 8 băng tần"></div>
+        <label class="setting"><span><b>Adaptive Volume Normalizer</b><small>Tự cân âm lượng và nén đỉnh lớn, hạn chế lúc quá nhỏ/lúc quá to.</small></span><input id="adaptiveNormalizer" type="checkbox"><i></i></label>
+        <label class="setting"><span><b>Âm thanh không gian 360°</b><small>Mô phỏng chuyển động âm thanh quanh người nghe bằng HRTF.</small></span><input id="spatialAudio" type="checkbox"><i></i></label>
+        <label class="range-setting" for="spatialIntensity"><span>Cường độ 360°</span><output id="spatialIntensityValue">65%</output></label>
+        <input id="spatialIntensity" class="range" type="range" min="0" max="100" step="5">
+      </div>
+      <p class="audio-note">Audio Studio tự theo dõi play/playing/metadata và quét lại video đang phát. Preview vẫn giữ player TikTok gốc; chỉ phần âm thanh được xử lý khi nguồn Web Audio an toàn.</p>
+    </section>
+
+    <section class="card">
+      <h2>Dịch từ khóa tìm kiếm</h2>
+      <label class="setting"><span><b>Bật nút dịch</b><small>Thêm nút dịch cạnh ô tìm kiếm TikTok.</small></span><input id="searchEnabled" type="checkbox"><i></i></label>
+      <label class="setting"><span><b>Tự dịch khi Enter</b><small>Dịch trước khi TikTok tìm kiếm.</small></span><input id="autoTranslateOnSearch" type="checkbox"><i></i></label>
+      <label class="field full"><span>Ngôn ngữ đích</span>
+        <select id="targetLanguage">
+          <option value="en">Tiếng Anh</option>
+          <option value="lo">Tiếng Lào</option>
+          <option value="th">Tiếng Thái</option>
+          <option value="km">Tiếng Campuchia</option>
+          <option value="vi">Tiếng Việt</option>
+        </select>
+      </label>
+    </section>
+
+    <section class="card">
+      <h2>Bộ lọc video tìm kiếm</h2>
+      <label class="setting"><span><b>Bật bộ lọc</b><small>Hiển thị hoặc ẩn toàn bộ công cụ lọc trên trang kết quả TikTok.</small></span><input id="searchFilterEnabled" type="checkbox"><i></i></label>
+    </section>
+
+
+
+    <section class="shortcut-card shortcuts">
+      <strong>KEYBOARD SHORTCUTS</strong>
+      <div><kbd>←</kbd><kbd>→</kbd><span>Tua −3 giây / +3 giây</span></div>
+      <div><kbd>,</kbd><kbd>.</kbd><span>Giảm / tăng tốc độ phát</span></div>
+      <div><kbd>Z</kbd><span>Chuyển mức zoom video</span></div>
+      <div><kbd>S</kbd><span>Chụp frame vào clipboard</span></div>
+      <div><kbd>C</kbd><span>Bật / tắt Clean Mode</span></div>
+      <div><kbd>Space</kbd><span>Phát / tạm dừng video</span></div>
+      <div><kbd>I</kbd><span>Mở bảng Video Info</span></div>
+      <div><kbd>D</kbd><span>Tải video HD hiện tại</span></div>
+      <div><kbd>F</kbd><span>Tìm khung hình video trên 1688</span></div>
+    </section>
+    <p class="footer">@tranductai · Cài đặt được lưu tự động</p>
+  </main>
+
+  <section id="mandatoryUpdateOverlay" class="mandatory-update-overlay" hidden aria-hidden="true">
+    <div class="mandatory-update-dialog" role="dialog" aria-modal="true" aria-labelledby="mandatoryUpdateTitle">
+      <div class="mandatory-update-symbol">↑</div>
+      <span class="mandatory-update-kicker">CẬP NHẬT BẮT BUỘC</span>
+      <h2 id="mandatoryUpdateTitle">Phiên bản mới đã sẵn sàng</h2>
+      <p id="mandatoryUpdateMessage">Bạn cần cập nhật Extension để tiếp tục sử dụng toàn bộ tính năng.</p>
+      <div class="mandatory-update-versions"><span>Hiện tại <b id="mandatoryCurrentVersion">3.6.0</b></span><i>→</i><span>Mới nhất <b id="mandatoryLatestVersion">—</b></span></div>
+      <p id="mandatoryUpdateNotes" class="mandatory-update-notes" hidden></p>
+      <button id="mandatoryUpdateApply" class="mandatory-update-button" type="button">Tải và cập nhật ngay</button>
+      <button id="mandatoryUpdateCheck" class="mandatory-update-secondary" type="button">Kiểm tra lại máy chủ</button>
+      <small>Extension đã tạm khóa để tránh lỗi không tương thích với máy chủ.</small>
+    </div>
+  </section>
+
+  <div id="watchHistoryModal" class="watch-history-modal" hidden aria-hidden="true">
+    <section class="watch-history-dialog" role="dialog" aria-modal="true" aria-labelledby="watchHistoryTitle">
+      <header class="watch-history-dialog-head">
+        <div><h2 id="watchHistoryTitle">Lịch sử xem</h2><p>200 video gần nhất bạn đã xem</p></div>
+        <button id="watchHistoryClose" type="button" aria-label="Đóng lịch sử xem" title="Đóng">×</button>
+      </header>
+      <div class="watch-history-dialog-body">
+        <div id="watchHistoryList" class="watch-history-grid"></div>
+        <p id="watchHistoryEmpty" class="watch-empty">Chưa có video trong lịch sử xem.</p>
+      </div>
+      <footer class="watch-history-dialog-footer">
+        <button id="watchHistoryClear" type="button">Xóa lịch sử</button>
+      </footer>
+    </section>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

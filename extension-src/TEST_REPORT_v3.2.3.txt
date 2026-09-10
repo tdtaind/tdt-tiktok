@@ -1,0 +1,24 @@
+TIKTOK TÀI ĐẸP TRAI v3.2.3 - TEST REPORT
+========================================
+
+- JavaScript syntax: PASS (17 files)
+- manifest.json parse/version: PASS (3.2.3)
+- Manifest referenced files: PASS (13 unique refs)
+- v3.2.2 file inventory preservation: PASS (no functional file removed)
+- Native Audio Bridge markers: PASS
+- No forced CORS on HD replacement: PASS
+- Landscape geometry/action-rail protection markers: PASS
+- TikTok snapshot action-rail selector: PASS (3 matches)
+- Legacy feature modules present: PASS
+
+Main regression targets:
+- Homepage clips: primary native TikTok video is no longer muted/paused before HD player is ready.
+- Native Audio Bridge supplies audio while HD replacement supplies picture.
+- Signed HD URL is loaded without forced crossorigin.
+- Audio Studio prefers the active native audio bridge when available.
+- 16:9 player overlay is limited to the native video rectangle.
+- TikTok landscape action rail is preserved/raised and can be docked when rendered off-screen.
+- Clean Mode still takes priority and may intentionally hide native action UI.
+
+Note:
+Runtime behavior still depends on TikTok DOM/CDN/session state and Chrome autoplay/WebAudio policy.

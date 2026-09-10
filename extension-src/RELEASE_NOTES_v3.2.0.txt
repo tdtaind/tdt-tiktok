@@ -1,0 +1,25 @@
+TIKTOK TÀI ĐẸP TRAI — RELEASE NOTES v3.2.0
+==========================================
+
+1. GIỮ NGUYÊN TOÀN BỘ CHỨC NĂNG v3.1.0
+Không loại bỏ permission, module, tính năng tải HD, subtitle, thống kê, Watch Analytics, 1688, proxy, Vercel hoặc remote access.
+
+2. THANH ĐIỀU KHIỂN VIDEO
+- Thu nhỏ kích thước nút, icon, chữ thời gian, khoảng cách và chiều cao control bar.
+- Thêm phân loại aspect: portrait (<0.82), square (0.82–1.22), landscape (>1.22).
+- Thêm density theo bề rộng video thực tế: micro (<350px), compact (<520px), regular.
+- Thanh điều khiển luôn dùng kích thước dựa trên chính video thay vì viewport.
+- Caption / metadata được căn lại để không đè lên control bar mới.
+- Giữ đầy đủ Play/Pause, seek, buffered, volume, speed, snapshot, Clean Mode, PiP, Web Fullscreen, Fullscreen.
+
+3. AUDIO STUDIO
+- Chuyển từ 1 engine chỉ gắn với replacement video sang shared AudioContext + nhiều processing chain.
+- Tự áp dụng cho video hiện tại và các video TikTok đang/chuyển sang phát sau khi Web Audio được mở khóa.
+- Gắn engine khi video play / loadedmetadata / canplay và quét lại video khả dụng.
+- Không đóng shared AudioContext khi đổi video.
+- Không hủy MediaElementSourceNode của video TikTok tạm detach để tránh lỗi không thể createMediaElementSource lần hai.
+- Tắt AUDIO chuyển graph về neutral pass-through thay vì làm im tiếng media đã route qua Web Audio.
+
+4. ỔN ĐỊNH
+- Giữ fallback nếu một nguồn không hỗ trợ Web Audio.
+- Không route media vào AudioContext đang suspended để tránh autoplay bị im tiếng.

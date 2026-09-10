@@ -1,0 +1,33 @@
+TIKTOK TÀI ĐẸP TRAI v3.1.0 — VIDEO CONTROL BAR UPDATE
+
+Mục tiêu
+- Giữ nguyên toàn bộ chức năng của v3.0.0.
+- Thay thanh điều khiển video theo bố cục mẫu TikTok đã cung cấp.
+- Cải thiện thao tác phát, tua, âm lượng, tốc độ, toàn màn hình và độ ổn định khi chuyển video.
+
+Thay đổi chính
+1. Thanh điều khiển mới ở đáy video
+   - Timeline tải đệm + phần đã phát màu TikTok.
+   - Nút Phát/Tạm dừng và thời gian hiện tại / tổng thời lượng.
+   - Âm lượng + slider khi rê chuột/focus.
+   - Tốc độ 0.5x–4x.
+   - Chụp khung hình.
+   - Clean Mode.
+   - Picture-in-Picture (PiP).
+   - Web fullscreen (lấp đầy trang).
+   - Fullscreen trình duyệt.
+
+2. Giữ nguyên các chức năng mở rộng đang có
+   - Phụ đề/Transcript365, dịch VI, thống kê video, tải HD, Video Info.
+   - Tìm hình 1688, sản phẩm, proxy, Vercel/update, watch analytics và các chức năng khác trong bản gốc.
+
+3. Fix/ổn định
+   - Đồng bộ icon Phát/Tạm dừng với trạng thái video.
+   - Hiển thị buffer/played/thumb theo tiến trình thật.
+   - Tua video cập nhật phụ đề và native subtitle clock.
+   - Web fullscreen giữ đúng host khi render/chuyển nguồn.
+   - Khôi phục overflow trang khi thoát/đóng player.
+   - Đồng bộ trạng thái PiP.
+   - Tránh đè caption/meta bằng thanh điều khiển mới.
+
+Extension ID key và cấu hình cập nhật của bản gốc được giữ nguyên.

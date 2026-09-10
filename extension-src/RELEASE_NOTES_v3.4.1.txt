@@ -1,0 +1,10 @@
+TikTok Tài Đẹp Trai v3.4.1 FINAL
+
+- Giữ nguyên toàn bộ chức năng v3.4.0.
+- Fix Kalodata API HTTP 404 do nối lặp /openapi/v1/video/detail.
+- Chấp nhận Base URL, /openapi, /openapi/v1 hoặc full endpoint /openapi/v1/video/detail.
+- Tự fallback về endpoint canonical trên cùng API origin nếu API gateway/base-path trả 404.
+- Lỗi 404 giờ hiển thị endpoint đã thử để chẩn đoán đúng host do Kalodata cấp.
+- Hỗ trợ host chính thức kalodata.com và kalowave.com.
+- Giữ nguyên header secret-key, payload region/language/currency/date_range/video_id, cache và chống request trùng.
+- Không thay đổi EchoTik, Audio Studio, Auto Replace HD, proxy, Vercel, Transcript365, 1688 và các chức năng cũ.

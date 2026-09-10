@@ -1,0 +1,26 @@
+TikTok Tài Đẹp Trai v3.6.0 FINAL - TEST REPORT
+Date: 2026-08-18
+
+PASS - All JavaScript files pass node --check.
+PASS - manifest.json parses correctly.
+PASS - Popup getElementById references: 99/99 resolved; no missing IDs.
+PASS - Analytics UI target changed from .tpt-cb-row to .control-dock.
+PASS - GMV dock badge exists and is rendered as a compact pill.
+PASS - Detailed panel renders only the selected provider.
+PASS - Automatic video analysis requests only the selected provider.
+PASS - EchoTik and Kalodata manual Analyze Current Video messages remain available.
+PASS - Shop Analytics dock can be disabled independently in popup.
+PASS - Provider can be selected independently: EchoTik or Kalodata.
+PASS - Migration fallback: when only Kalodata was enabled before v3.6.0, Kalodata becomes the default visible provider until a UI preference is saved.
+PASS - Clean Mode still suppresses the Analytics dock.
+PASS - MutationObserver now filters unrelated TikTok DOM mutations.
+PASS - Manifest permissions are byte-for-byte equivalent as arrays to v3.5.0.
+PASS - Manifest host_permissions are unchanged from v3.5.0.
+PASS - Extension key unchanged.
+PASS - update_url unchanged.
+PASS - Chromium headless smoke-load reports no extension/manifest/service-worker errors.
+
+Behavior notes:
+- Automatic API fetching is performed only when: dock display is enabled, Clean Mode is off, selected provider is enabled, and .control-dock exists.
+- The unselected API retains credentials, range, cache and manual analysis support in popup; it is not auto-fetched/rendered on video.
+- GMV button displays compact value (e.g. GMV | 12.4M); full metrics remain in the expandable panel below control-dock.

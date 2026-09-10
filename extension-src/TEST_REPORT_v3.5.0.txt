@@ -1,0 +1,18 @@
+TEST REPORT v3.5.0
+
+PASS - node --check toàn bộ JavaScript.
+PASS - manifest.json hợp lệ, version 3.5.0.
+PASS - toàn bộ content/background references tồn tại.
+PASS - popup.js getElementById refs đều tồn tại, không trùng id.
+PASS - Kalodata direct sales_volume parser.
+PASS - Kalodata sibling metrics parser (video_id ở video, sales_volume ở metrics).
+PASS - Kalodata camelCase nested parser.
+PASS - Kalodata JSON-string nested parser.
+PASS - Kalodata sales_volume = 0 được giữ là 0 hợp lệ.
+PASS - Kalodata missing sales_volume được giữ null/Unavailable, không ép thành 0.
+PASS - EchoTik Trends snapshot delta test Sales/GMV/Views.
+PASS - Không mất Chrome permission so với v3.4.3.
+PASS - Không mất host_permission so với v3.4.3.
+PASS - extension key giữ nguyên.
+PASS - update_url giữ nguyên.
+PASS - Chromium smoke-load: không có manifest/service-worker/syntax error; chỉ có DBus warnings của môi trường headless.

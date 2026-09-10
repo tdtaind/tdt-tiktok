@@ -1,0 +1,11 @@
+TikTok Tài Đẹp Trai v3.6.0 FINAL
+
+- Chuyển Shop Analytics từ tpt-cb-row vào đúng .control-dock của player extension.
+- Thay nút API bằng badge GMV trực tiếp: GMV <giá trị>.
+- Popup có tuỳ chọn bật/tắt hiển thị GMV trên control-dock.
+- Popup có tuỳ chọn chọn duy nhất EchoTik hoặc Kalodata làm nguồn hiển thị.
+- Chỉ provider được chọn tự động fetch khi đổi video, giảm request/API quota và CPU.
+- Provider còn lại vẫn giữ nguyên credential, range, cache và nút phân tích thủ công trong popup.
+- Panel chi tiết chỉ render một provider, giao diện gọn hơn.
+- Panel mở ngay dưới control-dock; Clean Mode vẫn ẩn Analytics.
+- Không thay đổi các chức năng Auto Replace HD, Audio Studio, subtitle, download, proxy, Vercel, 1688, Watch Analytics, Product Widget...

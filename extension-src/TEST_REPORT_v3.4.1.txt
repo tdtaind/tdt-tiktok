@@ -1,0 +1,12 @@
+TikTok Tài Đẹp Trai v3.4.1 - Test report
+
+PASS - JavaScript syntax: background.js, popup.js, kalodata_content.js, content.js
+PASS - manifest.json JSON parse
+PASS - Kalodata endpoint builder accepts origin, /openapi, /openapi/v1 and full /openapi/v1/video/detail without path duplication
+PASS - API gateway base path is preserved for first attempt
+PASS - 404 fallback retries canonical /openapi/v1/video/detail on the same origin
+PASS - Existing Kalodata secret-key and JSON request schema retained
+PASS - EchoTik and existing extension features unchanged
+PASS - manifest keeps existing permissions/hosts and adds kalowave.com host support only
+
+Live Kalodata response still requires the actual Open API endpoint and Access Key issued for the account. HTTP 404 now reports attempted endpoint(s) instead of a generic error.

@@ -1,0 +1,20 @@
+TIKTOK TÀI ĐẸP TRAI v2.6.2
+
+CÁCH CÀI / CẬP NHẬT THỦ CÔNG
+1. Giải nén file ZIP.
+2. Mở chrome://extensions.
+3. Bật Chế độ dành cho nhà phát triển.
+4. Chọn Tải tiện ích đã giải nén và chọn thư mục vừa giải nén.
+5. Extension giữ nguyên key/ID cpndheccadlhkiogcfdhagomiadbaogn.
+6. Không cần gỡ phiên bản cũ nếu đang dùng cùng Extension ID.
+7. Mở popup và đăng nhập Google khi Extension yêu cầu.
+
+KIỂM TRA NHANH
+- Mở TikTok và thử player, phụ đề, bộ lọc, phím tắt.
+- Nhấn F trên video để tìm khung hình trên 1688.
+- Bấm nút 1688 trên ảnh sản phẩm TikTok Shop.
+- Mỗi lần tìm ảnh chỉ còn một tab kết quả 1688.
+
+XEM CHI TIẾT
+- RELEASE_NOTES_v2.6.2.txt
+- TEST_REPORT_v2.6.2.txt
