@@ -4,7 +4,7 @@ function safeSetHeader(response, name, value) {
 }
 
 export default async function handler(request, response) {
-  const payload = { ok: true, service: "tdt-control-vercel", version: "4.0.2", time: Date.now() };
+  const payload = { ok: true, service: "tdt-control-vercel", version: "4.0.3", time: Date.now() };
   try {
     if (response?.writableEnded) return;
     response.statusCode = 200;

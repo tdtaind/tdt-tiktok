@@ -1,4 +1,4 @@
-# TDT Control Center v4.0.0 — Vercel Only
+# TDT Control Center v4.0.3 — Vercel Only
 
 Bản này giữ nguyên các luồng chính của TDT Control Center nhưng chuyển toàn bộ runtime khỏi Firebase:
 

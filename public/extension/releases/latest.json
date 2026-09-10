@@ -1,11 +1,11 @@
 {
-  "version": "4.0.0",
-  "downloadUrl": "/api/v1/extension/download?version=4.0.0",
-  "releasePageUrl": "/extension/",
-  "releaseNotes": "Vercel-only: API, Google Sign-In, database, storage và cập nhật extension chạy trên Vercel; không còn phụ thuộc Firebase.",
-  "publishedAt": "2026-09-10T10:30:00+07:00",
-  "sha256": "80bbce4aaff1d050287411b831153ba156417a816c2ffd90f627ed8771f4ba46",
+  "version": "4.0.1",
+  "downloadUrl": "https://tdt-tiktok.vercel.app/api/v1/extension/download?version=4.0.1",
+  "releasePageUrl": "https://tdt-tiktok.vercel.app/extension/",
+  "releaseNotes": "v4.0.1: sửa Google Sign-In 404 DEPLOYMENT_NOT_FOUND và đồng bộ đúng production domain.",
+  "publishedAt": "2026-09-10T04:57:40.064455Z",
+  "sha256": "0b32dae821ce639dbe0bd8e884e627d6649f47846d736e1630cf0d15f6fe89f8",
   "mandatory": true,
-  "filename": "TikTok_Tai_Dep_Trai_v4.0.0.zip",
-  "sizeBytes": 327878
+  "filename": "TikTok_Tai_Dep_Trai_v4.0.1.zip",
+  "sizeBytes": 327894
 }

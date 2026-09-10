@@ -39,7 +39,7 @@ import {
   validUpdatePackageMagic
 } from "./update_package.js";
 
-const VERCEL_BASE_URL = String(process.env.PUBLIC_BASE_URL || "https://tdt-vercel-control.vercel.app").replace(/\/$/, "");
+const VERCEL_BASE_URL = String(process.env.PUBLIC_BASE_URL || "https://tdt-tiktok.vercel.app").replace(/\/$/, "");
 const APP_SECRET = String(process.env.TDT_APP_SECRET || process.env.TDT_ADMIN_TOKEN || "");
 if (!APP_SECRET || APP_SECRET.length < 32) {
   // Fail only when a protected endpoint is called; health/build should remain usable.
@@ -54,14 +54,14 @@ const UPDATE_RELEASE_DOC = "config/updateRelease";
 const UPDATE_REALTIME_PATH = "update";
 const ADMIN_BOOTSTRAP_VERSION = "admin-default-v4.0.2";
 const DEFAULT_UPDATE_RELEASE = Object.freeze({
-  version: "4.0.0",
-  downloadUrl: `${VERCEL_BASE_URL}/extension/releases/TikTok_Tai_Dep_Trai_v4.0.0.zip`,
+  version: "4.0.1",
+  downloadUrl: `${VERCEL_BASE_URL}/extension/releases/TikTok_Tai_Dep_Trai_v4.0.1.zip`,
   releasePageUrl: `${VERCEL_BASE_URL}/extension/`,
-  releaseNotes: "Vercel-only release: backend, auth, database and update storage no longer depend on Vercel.",
+  releaseNotes: "v4.0.1: sửa Google Sign-In dùng đúng production domain và đồng bộ origin theo PUBLIC_BASE_URL.",
   publishedAt: new Date().toISOString(),
   sha256: "80bbce4aaff1d050287411b831153ba156417a816c2ffd90f627ed8771f4ba46",
   mandatory: true,
-  filename: "TikTok_Tai_Dep_Trai_v4.0.0.zip",
+  filename: "TikTok_Tai_Dep_Trai_v4.0.1.zip",
   storagePath: "",
   sizeBytes: 327878,
   updatedAt: 0,
@@ -110,6 +110,24 @@ async function deleteDoc(path, namespace = "doc") { await dbReady(); await sql`D
 function documentReference(path) { return { path: encodePath(path), get: () => getDoc(path), set: (v,o={}) => setDoc(path,v,o) }; }
 function realtimeReference(path) { return { path: encodePath(path), get: () => getDoc(path,"rt"), set: (v) => setDoc(path,v,{},"rt"), transaction: async (fn) => { const current = await getDoc(path,"rt"); const next = fn(current.exists ? current.val() : null); const value = next === undefined ? (current.exists ? current.val() : null) : next; if (value !== null) await setDoc(path,value,{},"rt"); return { committed: true, snapshot: makeSnapshot({data:value}) }; } }; }
 function realtimeDatabase() { return { ref: (path) => realtimeReference(path) }; }
+
+function sqlComparisonOperator(operator) {
+  const op = String(operator || "==").trim();
+  const operators = Object.freeze({
+    "==": "=",
+    "=": "=",
+    "!=": "<>",
+    "<>": "<>",
+    ">": ">",
+    ">=": ">=",
+    "<": "<",
+    "<=": "<="
+  });
+  const normalized = operators[op];
+  if (!normalized) throw Object.assign(new Error(`Toán tử truy vấn không được hỗ trợ: ${op}`), { status: 400 });
+  return normalized;
+}
+
 function collectionReference(name) {
   const state = { name: encodePath(name), filters: [], order: null, limit: null };
   const api = {
@@ -120,14 +138,47 @@ function collectionReference(name) {
       await dbReady();
       let q = `SELECT path,data FROM app_documents WHERE namespace='doc' AND path LIKE $1`;
       const params = [`${state.name}/%`];
-      for (const [field,op,value] of state.filters) { const idx=params.length+1; if(typeof value === "boolean") { q += ` AND (data->>$${idx}) = $${idx+1}`; params.push(field,String(value)); } else if(typeof value === "number") { q += ` AND (data->>$${idx})::double precision ${op} $${idx+1}`; params.push(field,Number(value)); } else { q += ` AND (data->>$${idx}) ${op} $${idx+1}`; params.push(field,String(value)); } }
-      if (state.order) { const idx=params.length+1; q += ` ORDER BY (data->>$${idx})::double precision ${state.order[1]}`; params.push(state.order[0]); }
+      for (const [field,op,value] of state.filters) {
+        const idx=params.length+1;
+        const sqlOp=sqlComparisonOperator(op);
+        if(typeof value === "boolean") {
+          q += ` AND (data ->> ($${idx})::text) ${sqlOp} ($${idx+1})::text`;
+          params.push(field,String(value));
+        } else if(typeof value === "number") {
+          q += ` AND COALESCE(NULLIF(data ->> ($${idx})::text, ''), '0')::double precision ${sqlOp} ($${idx+1})::double precision`;
+          params.push(field,Number(value));
+        } else {
+          q += ` AND (data ->> ($${idx})::text) ${sqlOp} ($${idx+1})::text`;
+          params.push(field,String(value));
+        }
+      }
+      if (state.order) { const idx=params.length+1; q += ` ORDER BY COALESCE(NULLIF(data ->> ($${idx})::text, ''), '0')::double precision ${state.order[1]}`; params.push(state.order[0]); }
       if (state.limit) q += ` LIMIT ${state.limit}`;
       const result = await sql.query(q, params);
       return { size: result.rows.length, docs: result.rows.map(r=>makeSnapshot(r)) };
     },
-    count() { return { get: async () => { await dbReady(); let q=`SELECT COUNT(*)::bigint AS count FROM app_documents WHERE namespace='doc' AND path LIKE $1`; const params=[`${state.name}/%`]; for(const [field,op,value] of state.filters){const k=params.length+1; if(typeof value === "boolean"){q+=` AND (data->>$${k}) = $${k+1}`;params.push(field,String(value));} else if(typeof value === "number"){q+=` AND (data->>$${k})::double precision ${op} $${k+1}`;params.push(field,Number(value));} else {q+=` AND (data->>$${k}) ${op} $${k+1}`;params.push(field,String(value));}} const result=await sql.query(q,params); return { data:()=>({count:Number(result.rows[0]?.count||0)}) }; } }; },
-    aggregate(spec) { return { get: async () => { await dbReady(); const entries=Object.entries(spec||{}); const values={}; for (const [alias,agg] of entries) { const result=await sql.query(`SELECT COALESCE(SUM(COALESCE((data->>$1)::numeric,0)),0) AS value FROM app_documents WHERE namespace='doc' AND path LIKE $2`, [agg.field, `${state.name}/%`]); values[alias]=Number(result.rows[0]?.value||0); } return { data:()=>values }; } }; }
+    count() { return { get: async () => {
+      await dbReady();
+      let q=`SELECT COUNT(*)::bigint AS count FROM app_documents WHERE namespace='doc' AND path LIKE $1`;
+      const params=[`${state.name}/%`];
+      for(const [field,op,value] of state.filters){
+        const k=params.length+1;
+        const sqlOp=sqlComparisonOperator(op);
+        if(typeof value === "boolean"){
+          q+=` AND (data ->> ($${k})::text) ${sqlOp} ($${k+1})::text`;
+          params.push(field,String(value));
+        } else if(typeof value === "number"){
+          q+=` AND COALESCE(NULLIF(data ->> ($${k})::text, ''), '0')::double precision ${sqlOp} ($${k+1})::double precision`;
+          params.push(field,Number(value));
+        } else {
+          q+=` AND (data ->> ($${k})::text) ${sqlOp} ($${k+1})::text`;
+          params.push(field,String(value));
+        }
+      }
+      const result=await sql.query(q,params);
+      return { data:()=>({count:Number(result.rows[0]?.count||0)}) };
+    } }; },
+    aggregate(spec) { return { get: async () => { await dbReady(); const entries=Object.entries(spec||{}); const values={}; for (const [alias,agg] of entries) { const result=await sql.query(`SELECT COALESCE(SUM(COALESCE(NULLIF(data ->> ($1)::text, ''), '0')::numeric),0) AS value FROM app_documents WHERE namespace='doc' AND path LIKE $2`, [agg.field, `${state.name}/%`]); values[alias]=Number(result.rows[0]?.value||0); } return { data:()=>values }; } }; }
   };
   return api;
 }
@@ -335,7 +386,7 @@ async function ensureAdminCredentials() {
   const snapshot = await reference.get();
   const current = snapshot.exists ? (snapshot.data() || {}) : {};
 
-  // v4.0.2 performs one intentional bootstrap/reset to admin/admin.
+  // Bootstrap marker intentionally stays v4.0.2 so v4.0.3+ never resets credentials that were already changed.
   // The marker is persisted so a later cold start/redeploy of the same build
   // never overwrites credentials after the administrator changes them.
   if (current.bootstrapVersion === ADMIN_BOOTSTRAP_VERSION && current.passwordSalt && current.passwordHash) {
@@ -1032,7 +1083,7 @@ async function handleAdminApi(request, response, pathname) {
 export async function route(request, response) {
   const pathname = requestPath(request);
   if (pathname === "/api/health" || pathname === "/health") {
-    return sendJson(response, 200, { ok: true, service: "tdt-control-vercel", version: "4.0.2", time: Date.now() });
+    return sendJson(response, 200, { ok: true, service: "tdt-control-vercel", version: "4.0.3", time: Date.now() });
   }
   if (pathname === "/api/v1/auth/google") return handleGoogleExchange(request, response);
   if (pathname === "/api/v1/auth/refresh") return handleExtensionRefresh(request, response);

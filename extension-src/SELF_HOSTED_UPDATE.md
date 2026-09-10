@@ -2,8 +2,8 @@
 
 Extension v2.3.9 giữ nguyên Extension ID `cpndheccadlhkiogcfdhagomiadbaogn`.
 
-- API manifest động: `https://tdt-vercel-control.vercel.app/api/v1/extension/update-manifest`
-- API tải gói: `https://tdt-vercel-control.vercel.app/api/v1/extension/download`
+- API manifest động: `https://tdt-tiktok.vercel.app/api/v1/extension/update-manifest`
+- API tải gói: `https://tdt-tiktok.vercel.app/api/v1/extension/download`
 - Kênh thông báo: Vercel Realtime Database tại `/update`.
 - Chu kỳ kiểm tra dự phòng: 60 phút; đồng thời kiểm tra khi Chrome khởi động, khi mở popup và khi heartbeat.
 - Bản bắt buộc tự khóa phiên bản cũ, hiện popup update và tự tải gói mới.

@@ -1,11 +1,11 @@
 {
   "private": true,
   "name": "tdt-control-vercel-only",
-  "version": "4.0.2",
+  "version": "4.0.3",
   "type": "module",
   "scripts": {
     "vercel-build": "node scripts/vercel-build.mjs",
-    "check": "node --check api/health.js && node --check api/admin/[...path].js && node --check api/v1/auth/[...path].js && node --check api/v1/extension/[...path].js && node --check server/index.js && node --check server/access.js && node --check server/admin_auth.js && node --check server/sync_logic.js && node --check server/update_package.js"
+    "check": "node --check api/health.js && node --check api/admin/[...path].js && node --check api/v1/auth/[...path].js && node --check api/v1/extension/[...path].js && node --check server/index.js && node --check server/access.js && node --check server/admin_auth.js && node --check server/sync_logic.js && node --check server/update_package.js && node --check scripts/vercel-build.mjs"
   },
   "dependencies": {
     "@vercel/blob": "2.0.0",

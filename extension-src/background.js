@@ -73,10 +73,14 @@ const FIREBASE_AUTH_KEY = "tdt_vercel_google_auth_v2";
 const FIREBASE_AUTH_LAST_OK_KEY = "tdt_vercel_auth_last_ok_v1";
 const FIREBASE_AUTH_TRANSIENT_GRACE_MS = 7 * 24 * 60 * 60 * 1000;
 const GOOGLE_AUTH_OFFSCREEN_PATH = "offscreen.html"; // Legacy fallback, no longer used by the primary flow.
-const GOOGLE_AUTH_PAGE_ORIGINS = new Set([
-  "https://tdt-vercel-control.vercel.app"
-]);
-const GOOGLE_AUTH_PAGE_ORIGIN = "https://tdt-vercel-control.vercel.app";
+const GOOGLE_AUTH_PAGE_ORIGIN = (() => {
+  try {
+    return new URL(REMOTE_CONFIG.serverUrl || "https://tdt-tiktok.vercel.app").origin;
+  } catch (_error) {
+    return "https://tdt-tiktok.vercel.app";
+  }
+})();
+const GOOGLE_AUTH_PAGE_ORIGINS = new Set([GOOGLE_AUTH_PAGE_ORIGIN]);
 const GOOGLE_AUTH_WINDOW_BASE_URL = `${GOOGLE_AUTH_PAGE_ORIGIN}/auth-extension/`;
 const GOOGLE_AUTH_PENDING_KEY = "tdt_google_auth_pending_v3";
 const GOOGLE_AUTH_RESULT_KEY = "tdt_google_auth_result_v3";

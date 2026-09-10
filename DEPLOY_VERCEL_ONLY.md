@@ -24,7 +24,7 @@ Release uploads use direct browser-to-Blob upload, so large ZIP/CRX files do not
 Create an OAuth 2.0 Web application client in Google Cloud Console.
 
 Add the exact deployed origin, for example:
-`https://tdt-vercel-control.vercel.app`
+`https://tdt-tiktok.vercel.app`
 
 Set that client ID as `GOOGLE_CLIENT_ID`.
 

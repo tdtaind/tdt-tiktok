@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "TikTok Tài Đẹp Trai",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "TikTok Tài Đẹp Trai v3.6.0: Shop Analytics nằm trong control-dock, badge GMV trực tiếp trên dock, chỉ tự hiển thị/phân tích một API được chọn; giữ nguyên toàn bộ chức năng.",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmVIGT5Qhgl+q/s9apFXyTRnmTalkAkYzfArj12kKN8BpHRJsbzMBaeoX09P/bFpt4IikASSgB+2VoDujkFHDF/f9RcVdbmdt3FfO/QJC8DBOJH7WY6VyhNWOvUE9yklB6U/Iu98tGAifPk295B0bmX2PtjUOdzIih6wJ1C9XDunHYtqJlTUqTxnfUY5H4mS1Y8VdqaeYyxz/lj4JKzY3bodw1kOnWJ/jK1ziTncRfP6qlLjA+gvLvE4Mq5np8EF3qXJGcHP9iu0kQbuEJy+Oh4CZfgBrFAdxy95hSM4G4VIzC/Q7n/CVnixYqrhmAlNlNpLlcKBuJm/unP/zakz3CQIDAQAB",
   "permissions": [
@@ -24,7 +24,7 @@
     "https://*.transcript365.com/*",
     "https://api.proxyscrape.com/*",
     "https://identitytoolkit.googleapis.com/*",
-    "https://tdt-vercel-control.vercel.app/*",
+    "https://tdt-tiktok.vercel.app/*",
     "https://*.tiktokcdn.com/*",
     "https://*.tiktokcdn-us.com/*",
     "https://*.byteimg.com/*",
@@ -47,7 +47,7 @@
     "service_worker": "background.js"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; frame-src https://tdt-vercel-control.vercel.app"
+    "extension_pages": "script-src 'self'; object-src 'self'; frame-src https://tdt-tiktok.vercel.app"
   },
   "action": {
     "default_popup": "popup.html",
@@ -171,8 +171,8 @@
   ],
   "externally_connectable": {
     "matches": [
-      "https://tdt-vercel-control.vercel.app/*"
+      "https://tdt-tiktok.vercel.app/*"
     ]
   },
-  "update_url": "https://tdt-vercel-control.vercel.app/extension/updates.xml"
+  "update_url": "https://tdt-tiktok.vercel.app/extension/updates.xml"
 }
