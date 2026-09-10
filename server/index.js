@@ -52,6 +52,7 @@ const MAX_USERS_IN_DASHBOARD = 1000;
 const MAX_USERS_IN_EXPORT = 5000;
 const UPDATE_RELEASE_DOC = "config/updateRelease";
 const UPDATE_REALTIME_PATH = "update";
+const ADMIN_BOOTSTRAP_VERSION = "admin-default-v4.0.2";
 const DEFAULT_UPDATE_RELEASE = Object.freeze({
   version: "4.0.0",
   downloadUrl: `${VERCEL_BASE_URL}/extension/releases/TikTok_Tai_Dep_Trai_v4.0.0.zip`,
@@ -332,22 +333,31 @@ function adminLoginRateLimited(request, failed = false) {
 async function ensureAdminCredentials() {
   const reference = firestore.doc("config/adminAuth");
   const snapshot = await reference.get();
-  if (snapshot.exists) return snapshot.data();
+  const current = snapshot.exists ? (snapshot.data() || {}) : {};
+
+  // v4.0.2 performs one intentional bootstrap/reset to admin/admin.
+  // The marker is persisted so a later cold start/redeploy of the same build
+  // never overwrites credentials after the administrator changes them.
+  if (current.bootstrapVersion === ADMIN_BOOTSTRAP_VERSION && current.passwordSalt && current.passwordHash) {
+    return current;
+  }
+
+  const now = Date.now();
   const password = await hashPassword(DEFAULT_ADMIN_PASSWORD);
-  await firestore.runTransaction(async (transaction) => {
-    const current = await transaction.get(reference);
-    if (!current.exists) transaction.set(reference, {
-      username: DEFAULT_ADMIN_USERNAME,
-      passwordSalt: password.salt,
-      passwordHash: password.hash,
-      passwordAlgorithm: password.algorithm,
-      version: 1,
-      mustChangePassword: true,
-      createdAt: Date.now(),
-      updatedAt: Date.now()
-    });
-  });
-  return (await reference.get()).data();
+  const next = {
+    username: DEFAULT_ADMIN_USERNAME,
+    passwordSalt: password.salt,
+    passwordHash: password.hash,
+    passwordAlgorithm: password.algorithm,
+    version: Math.max(1, Number(current.version) || 0) + (snapshot.exists ? 1 : 0),
+    mustChangePassword: true,
+    bootstrapVersion: ADMIN_BOOTSTRAP_VERSION,
+    createdAt: Number(current.createdAt) || now,
+    updatedAt: now,
+    bootstrapResetAt: now
+  };
+  await reference.set(next, { merge: true });
+  return next;
 }
 
 async function authorizedAdminToken(token){
@@ -886,6 +896,7 @@ async function handleAdminBlobUpload(request,response){
     const result=await handleUpload({request,body:requestBody(request),onBeforeGenerateToken:async(_pathname,clientPayload)=>{
       const context=await authorizedAdminToken(clientPayload);
       if(!context)throw new Error("Phiên quản trị không hợp lệ hoặc đã hết hạn.");
+      if(context.credentials.mustChangePassword===true)throw new Error("Bạn phải đổi tài khoản/mật khẩu admin mặc định trước khi tải file cập nhật.");
       return {allowedContentTypes:["application/zip","application/x-chrome-extension","application/octet-stream"],maximumSizeInBytes:20*1024*1024,addRandomSuffix:false,tokenPayload:JSON.stringify({admin:context.credentials.username})};
     }});
     return sendJson(response,200,result);
@@ -897,6 +908,15 @@ async function handleAdminApi(request, response, pathname) {
   if (pathname === "/api/admin/blob-upload") return handleAdminBlobUpload(request,response);
   const adminContext = await requireAdmin(request, response);
   if (!adminContext) return;
+
+  if (adminContext.credentials.mustChangePassword === true && pathname !== "/api/admin/change-credentials") {
+    return sendJson(response, 428, {
+      ok: false,
+      code: "ADMIN_PASSWORD_CHANGE_REQUIRED",
+      error: "Bạn phải đổi tài khoản/mật khẩu admin mặc định trước khi sử dụng trang quản trị.",
+      admin: { username: normalizeUsername(adminContext.credentials.username), mustChangePassword: true }
+    });
+  }
 
   if (request.method === "GET" && pathname === "/api/admin/state") {
     const force = /[?&]fresh=1(?:&|$)/.test(String(request.originalUrl || request.url || ""));
@@ -930,6 +950,8 @@ async function handleAdminApi(request, response, pathname) {
       passwordAlgorithm: password.algorithm,
       version: Math.max(1, Number(adminContext.credentials.version) || 1) + 1,
       mustChangePassword: false,
+      bootstrapVersion: ADMIN_BOOTSTRAP_VERSION,
+      passwordChangedAt: Date.now(),
       updatedAt: Date.now()
     };
     await firestore.doc("config/adminAuth").set(nextCredentials, { merge: true });
@@ -1010,7 +1032,7 @@ async function handleAdminApi(request, response, pathname) {
 export async function route(request, response) {
   const pathname = requestPath(request);
   if (pathname === "/api/health" || pathname === "/health") {
-    return sendJson(response, 200, { ok: true, service: "tdt-control-vercel", version: "4.0.0", time: Date.now() });
+    return sendJson(response, 200, { ok: true, service: "tdt-control-vercel", version: "4.0.2", time: Date.now() });
   }
   if (pathname === "/api/v1/auth/google") return handleGoogleExchange(request, response);
   if (pathname === "/api/v1/auth/refresh") return handleExtensionRefresh(request, response);
