@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { statSync, readFileSync as readFile } from "node:fs";
 import { createHash } from "node:crypto";
 import archiver from "archiver";
-const required=["public/index.html","public/admin/index.html","api/[...path].js","server/index.js"];
+const required=["public/index.html","public/admin/index.html","api/health.js","server/index.js"];
 for(const file of required)if(!existsSync(file))throw new Error(`Missing required deployment file: ${file}`);
 const clientId=String(process.env.GOOGLE_CLIENT_ID||"__GOOGLE_CLIENT_ID__").trim();
 writeFileSync("public/config.js",`window.TDT_CONFIG=${JSON.stringify({googleClientId:clientId})};\n`);
